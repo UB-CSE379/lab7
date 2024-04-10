@@ -3,6 +3,7 @@
 	.global board
 	.global current
 	.global pauseflag
+	.global maxTime
 
 testinglookuptable: .string "123456789",0
 
@@ -93,6 +94,14 @@ board6:	.string "+--------------------+", 0xA, 0xD
 		.string "+--------------------+", 0
 
 
+select_time_prompt:
+					.string "", 0xA, 0xD
+					.string "Select one of the Momementary Buttons on the Alice Board for a time limit", 0xA, 0xD
+					.string "Press SW5 - 100 second limit", 0xA, 0xD
+					.string "Press SW4 - 200 second limit", 0xA, 0xD
+					.string "Press SW3 - 300 second limit", 0xA, 0xD
+					.string "Press SW2 - No time limit", 0xA, 0xD
+
 
 prompt1: 			.string "", 0xA, 0xD
 					.string "Please Press SW1 On the Tiva To Play!!!", 0xA, 0xD
@@ -123,6 +132,7 @@ pauseflag:		.word 0
 	.global uart_interrupt_init
 	.global gpio_interrupt_init
 	.global timer_interrupt_init
+	.global gpio_btn_and_LED_init
 	.global UART0_Handler
 	.global Switch_Handler
 	.global Timer_Handler			; This is needed for Lab #6
@@ -136,6 +146,7 @@ pauseflag:		.word 0
 	.global output_string			; This is from your Lab #4 Library
 	.global uart_init				; This is from your Lab #4 Library
 	.global int2string				; This is from your Lab #4 Library
+	.global read_from_push_btns
 
 ;_______________________________________________________________________________________
 
@@ -148,6 +159,7 @@ ptr_to_board: 			.word board
 ptr_to_clearscreen:		.word clearscreen
 ptr_to_leftside			.word leftside
 
+ptr_to_alice_prompt:	.word select_time_prompt
 ptr_to_prompt1: 		.word prompt1
 ptr_to_lastprompt: 		.word lastprompt
 
@@ -160,6 +172,7 @@ ptr_position:			.word position
 
 ptr_to_check3:			.word check3
 ptr_to_pauseflag:		.word pauseflag
+ptr_to_maxTime:			.word maxTime
 ptr_score:				.word score
 
 
@@ -170,9 +183,15 @@ lab7:
 
 	;initializes the things
  	BL uart_init
+ 	BL gpio_btn_and_LED_init
 	BL uart_interrupt_init
 	BL gpio_interrupt_init
 	BL timer_interrupt_init
+
+	LDR r0, ptr_to_alice_prompt ;Prompt to tell user to select an Alice button for how long they want the game
+	BL output_string
+
+	BL read_from_push_btns ; will loop till one of the buttons pressed, max time limit is set
 
 
 	LDR r0, ptr_to_clearscreen	; clears the uart
@@ -470,4 +489,3 @@ timerEnd:
 end:
 
 	.end
-
