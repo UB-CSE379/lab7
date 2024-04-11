@@ -91,6 +91,7 @@ pauseflag:		.word 0
 	.global uart_interrupt_init
 	.global gpio_interrupt_init
 	.global timer_interrupt_init
+	.global gpio_btn_and_LED_init
 	.global UART0_Handler
 	.global Switch_Handler
 	.global Timer_Handler			; This is needed for Lab #6
@@ -170,6 +171,8 @@ lab7:
 	BL uart_interrupt_init
 	BL gpio_interrupt_init
 	BL timer_interrupt_init
+	BL gpio_btn_and_LED_init
+
 	
 	LDR r0, ptr_to_alice_prompt ;Prompt to tell user to select an Alice button for how long they want the game
 	BL output_string
