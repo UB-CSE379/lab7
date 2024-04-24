@@ -4,6 +4,88 @@
 	.global current
 	.global pauseflag
 
+	.global face1
+	.global face2
+	.global face3
+	.global face4
+	.global face5
+	.global face6
+	.global face7
+	.global face8
+	.global face9
+
+	.global sideflag
+	.global positionflag
+	.global startingpos
+
+
+	.global redtile
+	.global bluetile
+	.global greentile
+	.global whitetile
+	.global purpletile
+	.global yellowtile
+	.global resettile
+	.global clearline
+
+
+	.global cube1
+	.global cube2
+	.global cube3
+	.global cube4
+	.global cube5
+	.global cube6
+
+
+	.global b1sqr1_1
+	.global b1sqr1_2
+	.global b1sqr1_3
+
+	.global b1sqr2_1
+	.global b1sqr2_2
+	.global b1sqr2_3
+
+	.global b1sqr3_1
+	.global b1sqr3_2
+	.global b1sqr3_3
+
+	.global b1sqr4_1
+	.global b1sqr4_2
+	.global b1sqr4_3
+
+	.global b1sqr5_1
+	.global b1sqr5_2
+	.global b1sqr5_3
+
+	.global b1sqr6_1
+	.global b1sqr6_2
+	.global b1sqr6_3
+
+	.global b1sqr7_1
+	.global b1sqr7_2
+	.global b1sqr7_3
+
+	.global b1sqr8_1
+	.global b1sqr8_2
+	.global b1sqr8_3
+
+	.global b1sqr9_1
+	.global b1sqr9_2
+	.global b1sqr9_3
+
+	.global scoreline
+
+	.global clearscreen
+	.global	leftside
+	.global position
+
+
+
+
+
+
+
+
 cube1: .string "272771682",0
 cube2: .string "526643143",0
 cube3: .string "477135871",0
@@ -28,6 +110,36 @@ board:	.string "+--------------------+", 0xA, 0xD
 
 scoreline:		.string 27,"[15;1H",0
 clearline:		.string 27,"[K",0
+
+
+;cursor positions
+face1:			.string 27,"[40m"
+				.string 27,"[3;4H  ",0
+
+face2:			.string 27,"[40m"
+				.string 27,"[7;4H  ",0
+
+face3:			.string 27,"[40m"
+				.string 27,"[11;4H  ",0
+
+face4:			.string 27,"[40m"
+				.string 27,"[3;11H  ",0
+
+face5:			.string 27,"[40m"
+				.string 27,"[7;11H  ",0
+
+face6:			.string 27,"[40m"
+				.string 27,"[11;11H  ",0
+
+face7:			.string 27,"[40m"
+				.string 27,"[3;18H  ",0
+
+face8:			.string 27,"[40m"
+				.string 27,"[7;18H  ",0
+
+face9:			.string 27,"[40m"
+				.string 27,"[11;18H  ",0
+
 
 ;side 1
 
@@ -111,6 +223,7 @@ position: 		.word 0xFB	; center
 pauseflag:		.word 0
 sideflag:		.word 0
 positionflag:	.word 0
+startingpos		.word 2
 
 
 ;_______________________________________________________________________________________
@@ -124,6 +237,7 @@ positionflag:	.word 0
 	.global Timer_Handler			; This is needed for Lab #6
 	.global simple_read_character
 	.global lab7
+	.global board_handler
 
 
 	; from library file
@@ -165,6 +279,7 @@ ptr_position:			.word position
 ptr_to_pauseflag:		.word pauseflag
 ptr_to_sideflag:		.word sideflag
 ptr_to_positionflag:	.word positionflag
+ptr_to_spos				.word startingpos
 
 
 ptr_to_redtile:			.word redtile
@@ -175,6 +290,18 @@ ptr_to_purpletile:		.word purpletile
 ptr_to_yellowtile:		.word yellowtile
 ptr_to_resettile:		.word resettile
 ptr_to_clearline:		.word clearline
+
+;cursor pointers
+
+ptr_to_f1:				.word face1
+ptr_to_f2:				.word face2
+ptr_to_f3:				.word face3
+ptr_to_f4:				.word face4
+ptr_to_f5:				.word face5
+ptr_to_f6:				.word face6
+ptr_to_f7:				.word face7
+ptr_to_f8:				.word face8
+ptr_to_f9:				.word face9
 
 
 ptr_to_s1:				.word cube1
@@ -238,747 +365,7 @@ lab7:
 	BL gpio_interrupt_init
 	BL timer_interrupt_init
 
-
-	LDR r0, ptr_to_clearscreen	; clears the uart
-	BL output_string
-
-	LDR r0, ptr_to_leftside		; Goes to left side idk why but from lect
-	BL output_string
-
-	LDR r0, ptr_to_sideflag
-	LDR r1, [r0]
-
-	CMP r1,#0
-	BEQ side1
-
-	CMP r1,#1
-	BEQ side2
-
-	CMP r1,#2
-	BEQ side3
-
-	CMP r1,#3
-	BEQ side4
-
-	CMP r1,#4
-	BEQ side5
-
-	CMP r1,#5
-	BEQ side6
-
-	BNE lab7loop
-
-side1:
-
-	LDR r0, ptr_to_board			;prints the initial board
-    BL output_string
-    LDR r6, ptr_to_s1
-
-    B byte_loop1
-
-side2:
-
-	LDR r0, ptr_to_board			;prints the initial board
-    BL output_string
-    LDR r6, ptr_to_s2
-
-    B byte_loop1
-
-side3:
-
-	LDR r0, ptr_to_board			;prints the initial board
-    BL output_string
-    LDR r6, ptr_to_s3
-
-    B byte_loop1
-
-side4:
-
-	LDR r0, ptr_to_board			;prints the initial board
-    BL output_string
-    LDR r6, ptr_to_s4
-
-    B byte_loop1
-
-side5:
-
-	LDR r0, ptr_to_board			;prints the initial board
-    BL output_string
-    LDR r6, ptr_to_s5
-
-    B byte_loop1
-
-side6:
-
-	LDR r0, ptr_to_board			;prints the initial board
-    BL output_string
-    LDR r6, ptr_to_s6
-
-    B byte_loop1
-
-
-byte_loop1:
-	MOV r1, r6
-	LDRB r0, [r1]
-	CMP r0, #0
-	BEQ end_l
-	B process_byte
-post_proc:
-	LDR r4, ptr_to_positionflag
-	LDR r5, [r4]
-	ADD r5, r5, #1
-	STR r5,[r4]
-	CMP r5, #9
-	BEQ end_l
-	ADD r6, r6, #1
-	B byte_loop1
-
-
-process_byte:
-	CMP r0, #'1'
-	BEQ red
-	CMP r0, #'2'
-	BEQ red
-	CMP r0, #'3'
-	BEQ blue
-	CMP r0, #'4'
-	BEQ blue
-	CMP r0, #'5'
-	BEQ yellow
-	CMP r0, #'6'
-	BEQ purple
-	CMP r0, #'7'
-	BEQ purple
-	CMP r0, #'8'
-	BEQ white
-	CMP r0, #'9'
-	BEQ green
-
-	BNE r_end
-
-red:
-	LDR r4, ptr_to_positionflag
-	LDR r0, [r4]
-	CMP r0, #0
-	BEQ rmem1
-	CMP r0, #1
-	BEQ rmem2
-	CMP r0, #2
-	BEQ rmem3
-	CMP r0, #3
-	BEQ rmem4
-	CMP r0, #4
-	BEQ rmem5
-	CMP r0, #5
-	BEQ rmem6
-	CMP r0, #6
-	BEQ rmem7
-	CMP r0, #7
-	BEQ rmem8
-	CMP r0, #8
-	BEQ rmem9
-	bne r_end
-
-rmem1:
-	LDR r0, ptr_to_redtile
-	BL output_string
-
-	LDR r0, ptr_to_b1sqr1_1
-	BL output_string
-	b r_end
-
-rmem2:
-	LDR r0, ptr_to_redtile
-	BL output_string
-
-	LDR r0, ptr_to_b1sqr2_1
-	BL output_string
-
-	b r_end
-rmem3:
-	LDR r0, ptr_to_redtile
-	BL output_string
-
-	LDR r0, ptr_to_b1sqr3_1
-	BL output_string
-
-	b r_end
-
-rmem4:
-	LDR r0, ptr_to_redtile
-	BL output_string
-
-	LDR r0, ptr_to_b1sqr4_1
-	BL output_string
-
-	b r_end
-
-rmem5:
-	LDR r0, ptr_to_redtile
-	BL output_string
-
-	LDR r0, ptr_to_b1sqr5_1
-	BL output_string
-
-	b r_end
-
-rmem6:
-	LDR r0, ptr_to_redtile
-	BL output_string
-
-	LDR r0, ptr_to_b1sqr6_1
-	BL output_string
-
-	b r_end
-
-rmem7:
-	LDR r0, ptr_to_redtile
-	BL output_string
-
-	LDR r0, ptr_to_b1sqr7_1
-	BL output_string
-
-	b r_end
-
-rmem8:
-	LDR r0, ptr_to_redtile
-	BL output_string
-
-	LDR r0, ptr_to_b1sqr8_1
-	BL output_string
-
-	b r_end
-
-rmem9:
-	LDR r0, ptr_to_redtile
-	BL output_string
-
-	LDR r0, ptr_to_b1sqr9_1
-	BL output_string
-
-	b r_end
-
-
-blue:
-	LDR r4, ptr_to_positionflag
-	LDR r0, [r4]
-	CMP r0, #0
-	BEQ bmem1
-	CMP r0, #1
-	BEQ bmem2
-	CMP r0, #2
-	BEQ bmem3
-	CMP r0, #3
-	BEQ bmem4
-	CMP r0, #4
-	BEQ bmem5
-	CMP r0, #5
-	BEQ bmem6
-	CMP r0, #6
-	BEQ bmem7
-	CMP r0, #7
-	BEQ bmem8
-	CMP r0, #8
-	BEQ bmem9
-	bne r_end
-
-bmem1:
-	LDR r0, ptr_to_bluetile
-	BL output_string
-
-	LDR r0, ptr_to_b1sqr1_1
-	BL output_string
-	b r_end
-
-bmem2:
-	LDR r0, ptr_to_bluetile
-	BL output_string
-
-	LDR r0, ptr_to_b1sqr2_1
-	BL output_string
-
-	b r_end
-bmem3:
-	LDR r0, ptr_to_bluetile
-	BL output_string
-
-	LDR r0, ptr_to_b1sqr3_1
-	BL output_string
-
-	b r_end
-
-bmem4:
-	LDR r0, ptr_to_bluetile
-	BL output_string
-
-	LDR r0, ptr_to_b1sqr4_1
-	BL output_string
-
-	b r_end
-
-bmem5:
-	LDR r0, ptr_to_bluetile
-	BL output_string
-
-	LDR r0, ptr_to_b1sqr5_1
-	BL output_string
-
-	b r_end
-
-bmem6:
-	LDR r0, ptr_to_bluetile
-	BL output_string
-
-	LDR r0, ptr_to_b1sqr6_1
-	BL output_string
-
-	b r_end
-
-bmem7:
-	LDR r0, ptr_to_bluetile
-	BL output_string
-
-	LDR r0, ptr_to_b1sqr7_1
-	BL output_string
-
-	b r_end
-
-bmem8:
-	LDR r0, ptr_to_bluetile
-	BL output_string
-
-	LDR r0, ptr_to_b1sqr8_1
-	BL output_string
-
-	b r_end
-
-bmem9:
-	LDR r0, ptr_to_bluetile
-	BL output_string
-
-	LDR r0, ptr_to_b1sqr9_1
-	BL output_string
-
-	b r_end
-
-yellow:
-	LDR r4, ptr_to_positionflag
-	LDR r0, [r4]
-	CMP r0, #0
-	BEQ ymem1
-	CMP r0, #1
-	BEQ ymem2
-	CMP r0, #2
-	BEQ ymem3
-	CMP r0, #3
-	BEQ ymem4
-	CMP r0, #4
-	BEQ ymem5
-	CMP r0, #5
-	BEQ ymem6
-	CMP r0, #6
-	BEQ ymem7
-	CMP r0, #7
-	BEQ ymem8
-	CMP r0, #8
-	BEQ ymem9
-	bne r_end
-
-ymem1:
-	LDR r0, ptr_to_yellowtile
-	BL output_string
-
-	LDR r0, ptr_to_b1sqr1_1
-	BL output_string
-	b r_end
-
-ymem2:
-	LDR r0, ptr_to_yellowtile
-	BL output_string
-
-	LDR r0, ptr_to_b1sqr2_1
-	BL output_string
-
-	b r_end
-ymem3:
-	LDR r0, ptr_to_yellowtile
-	BL output_string
-
-	LDR r0, ptr_to_b1sqr3_1
-	BL output_string
-
-	b r_end
-
-ymem4:
-	LDR r0, ptr_to_yellowtile
-	BL output_string
-
-	LDR r0, ptr_to_b1sqr4_1
-	BL output_string
-
-	b r_end
-
-ymem5:
-	LDR r0, ptr_to_yellowtile
-	BL output_string
-
-	LDR r0, ptr_to_b1sqr5_1
-	BL output_string
-
-	b r_end
-
-ymem6:
-	LDR r0, ptr_to_yellowtile
-	BL output_string
-
-	LDR r0, ptr_to_b1sqr6_1
-	BL output_string
-
-	b r_end
-
-ymem7:
-	LDR r0, ptr_to_yellowtile
-	BL output_string
-
-	LDR r0, ptr_to_b1sqr7_1
-	BL output_string
-
-	b r_end
-
-ymem8:
-	LDR r0, ptr_to_yellowtile
-	BL output_string
-
-	LDR r0, ptr_to_b1sqr8_1
-	BL output_string
-
-	b r_end
-
-ymem9:
-	LDR r0, ptr_to_yellowtile
-	BL output_string
-
-	LDR r0, ptr_to_b1sqr9_1
-	BL output_string
-
-	b r_end
-
-purple:
-	LDR r4, ptr_to_positionflag
-	LDR r0, [r4]
-	CMP r0, #0
-	BEQ pmem1
-	CMP r0, #1
-	BEQ pmem2
-	CMP r0, #2
-	BEQ pmem3
-	CMP r0, #3
-	BEQ pmem4
-	CMP r0, #4
-	BEQ pmem5
-	CMP r0, #5
-	BEQ pmem6
-	CMP r0, #6
-	BEQ pmem7
-	CMP r0, #7
-	BEQ pmem8
-	CMP r0, #8
-	BEQ pmem9
-	bne r_end
-
-pmem1:
-	LDR r0, ptr_to_purpletile
-	BL output_string
-
-	LDR r0, ptr_to_b1sqr1_1
-	BL output_string
-	b r_end
-
-pmem2:
-	LDR r0, ptr_to_purpletile
-	BL output_string
-
-	LDR r0, ptr_to_b1sqr2_1
-	BL output_string
-
-	b r_end
-pmem3:
-	LDR r0, ptr_to_purpletile
-	BL output_string
-
-	LDR r0, ptr_to_b1sqr3_1
-	BL output_string
-
-	b r_end
-
-pmem4:
-	LDR r0, ptr_to_purpletile
-	BL output_string
-
-	LDR r0, ptr_to_b1sqr4_1
-	BL output_string
-
-	b r_end
-
-pmem5:
-	LDR r0, ptr_to_purpletile
-	BL output_string
-
-	LDR r0, ptr_to_b1sqr5_1
-	BL output_string
-
-	b r_end
-
-pmem6:
-	LDR r0, ptr_to_purpletile
-	BL output_string
-
-	LDR r0, ptr_to_b1sqr6_1
-	BL output_string
-
-	b r_end
-
-pmem7:
-	LDR r0, ptr_to_purpletile
-	BL output_string
-
-	LDR r0, ptr_to_b1sqr7_1
-	BL output_string
-
-	b r_end
-
-pmem8:
-	LDR r0, ptr_to_purpletile
-	BL output_string
-
-	LDR r0, ptr_to_b1sqr8_1
-	BL output_string
-
-	b r_end
-
-pmem9:
-	LDR r0, ptr_to_purpletile
-	BL output_string
-
-	LDR r0, ptr_to_b1sqr9_1
-	BL output_string
-
-	b r_end
-
-white:
-	LDR r4, ptr_to_positionflag
-	LDR r0, [r4]
-	CMP r0, #0
-	BEQ wmem1
-	CMP r0, #1
-	BEQ wmem2
-	CMP r0, #2
-	BEQ wmem3
-	CMP r0, #3
-	BEQ wmem4
-	CMP r0, #4
-	BEQ wmem5
-	CMP r0, #5
-	BEQ wmem6
-	CMP r0, #6
-	BEQ wmem7
-	CMP r0, #7
-	BEQ wmem8
-	CMP r0, #8
-	BEQ wmem9
-	bne r_end
-
-wmem1:
-	LDR r0, ptr_to_whitetile
-	BL output_string
-
-	LDR r0, ptr_to_b1sqr1_1
-	BL output_string
-	b r_end
-
-wmem2:
-	LDR r0, ptr_to_whitetile
-	BL output_string
-
-	LDR r0, ptr_to_b1sqr2_1
-	BL output_string
-
-	b r_end
-wmem3:
-	LDR r0, ptr_to_whitetile
-	BL output_string
-
-	LDR r0, ptr_to_b1sqr3_1
-	BL output_string
-
-	b r_end
-
-wmem4:
-	LDR r0, ptr_to_whitetile
-	BL output_string
-
-	LDR r0, ptr_to_b1sqr4_1
-	BL output_string
-
-	b r_end
-
-wmem5:
-	LDR r0, ptr_to_whitetile
-	BL output_string
-
-	LDR r0, ptr_to_b1sqr5_1
-	BL output_string
-
-	b r_end
-
-wmem6:
-	LDR r0, ptr_to_whitetile
-	BL output_string
-
-	LDR r0, ptr_to_b1sqr6_1
-	BL output_string
-
-	b r_end
-
-wmem7:
-	LDR r0, ptr_to_whitetile
-	BL output_string
-
-	LDR r0, ptr_to_b1sqr7_1
-	BL output_string
-
-	b r_end
-
-wmem8:
-	LDR r0, ptr_to_whitetile
-	BL output_string
-
-	LDR r0, ptr_to_b1sqr8_1
-	BL output_string
-
-	b r_end
-
-wmem9:
-	LDR r0, ptr_to_whitetile
-	BL output_string
-
-	LDR r0, ptr_to_b1sqr9_1
-	BL output_string
-
-	b r_end
-
-green:
-	LDR r4, ptr_to_positionflag
-	LDR r0, [r4]
-	CMP r0, #0
-	BEQ gmem1
-	CMP r0, #1
-	BEQ gmem2
-	CMP r0, #2
-	BEQ gmem3
-	CMP r0, #3
-	BEQ gmem4
-	CMP r0, #4
-	BEQ gmem5
-	CMP r0, #5
-	BEQ gmem6
-	CMP r0, #6
-	BEQ gmem7
-	CMP r0, #7
-	BEQ gmem8
-	CMP r0, #8
-	BEQ gmem9
-	bne r_end
-
-gmem1:
-	LDR r0, ptr_to_greentile
-	BL output_string
-
-	LDR r0, ptr_to_b1sqr1_1
-	BL output_string
-	b r_end
-
-gmem2:
-	LDR r0, ptr_to_greentile
-	BL output_string
-
-	LDR r0, ptr_to_b1sqr2_1
-	BL output_string
-
-	b r_end
-gmem3:
-	LDR r0, ptr_to_greentile
-	BL output_string
-
-	LDR r0, ptr_to_b1sqr3_1
-	BL output_string
-
-	b r_end
-
-gmem4:
-	LDR r0, ptr_to_greentile
-	BL output_string
-
-	LDR r0, ptr_to_b1sqr4_1
-	BL output_string
-
-	b r_end
-
-gmem5:
-	LDR r0, ptr_to_greentile
-	BL output_string
-
-	LDR r0, ptr_to_b1sqr5_1
-	BL output_string
-
-	b r_end
-
-gmem6:
-	LDR r0, ptr_to_greentile
-	BL output_string
-
-	LDR r0, ptr_to_b1sqr6_1
-	BL output_string
-
-	b r_end
-
-gmem7:
-	LDR r0, ptr_to_greentile
-	BL output_string
-
-	LDR r0, ptr_to_b1sqr7_1
-	BL output_string
-
-	b r_end
-
-gmem8:
-	LDR r0, ptr_to_greentile
-	BL output_string
-
-	LDR r0, ptr_to_b1sqr8_1
-	BL output_string
-
-	b r_end
-
-gmem9:
-	LDR r0, ptr_to_greentile
-	BL output_string
-
-	LDR r0, ptr_to_b1sqr9_1
-	BL output_string
-
-	b r_end
-
-r_end:
-
-	b post_proc
-
-end_l:
-
-
-
-
-
+	BL board_handler
 
 
 lab7loop:
@@ -1066,8 +453,6 @@ Timer_Handler:
 	BEQ PAUSE
 
 
-
-
 							; prev keys
 	LDR r0, ptr_to_current
 	LDR r1, [r0]
@@ -1086,6 +471,107 @@ Timer_Handler:
 wletter:
 	LDR r0, ptr_position
 	LDR r1, [r0]
+
+	LDR r1, ptr_to_s1
+	LDR r0, [r1]
+	CMP r0, #0
+	BEQ s1_w
+	CMP r0, #1
+	BEQ s2_w
+	CMP r0, #2
+	BEQ s3_w
+	CMP r0, #3
+	BEQ s4_w
+	CMP r0, #4
+	BEQ s5_w
+	CMP r0, #5
+	BEQ s6_w
+
+
+s1_w:
+
+	LDR r0, ptr_to_spos
+	LDR r1, [r0]
+
+	CMP r1, #1
+	BEQ w_1
+	CMP r1, #2
+	BEQ w_2
+	CMP r1, #3
+	BEQ w_3
+	CMP r1, #4
+	BEQ w_4
+	CMP r1, #5
+	BEQ w_5
+	CMP r1, #6
+	BEQ w_6
+	CMP r1, #7
+	BEQ w_7
+	CMP r1, #8
+	BEQ w_8
+
+w_1:
+	LDR r0, ptr_to_spos
+	MOV r1, #3
+	STR r1, [r0]
+
+	LDR r0, ptr_to_sideflag
+	MOV r1, #4
+	STR r1, [r0]
+
+	BL board_handler
+
+
+	LDR r0, ptr_to_f3
+	BL output_string
+
+	B mdone
+
+w_2:
+
+	LDR r0, ptr_to_spos
+	MOV r1, #1
+	STR r1, [r0]
+
+
+	BL board_handler
+
+	LDR r0, ptr_to_f1
+	BL output_string
+
+	B mdone
+
+
+w_3:
+
+w_4:
+
+w_5:
+
+w_6:
+
+w_7:
+
+w_8:
+
+
+
+
+
+
+s2_w:
+
+s3_w:
+
+s4_w:
+
+s5_w:
+
+s6_w:
+
+
+
+
 
 	LDR r0, ptr_to_moves	;increases the moves by 1
 	LDR r1, [r0]
