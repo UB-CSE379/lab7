@@ -82,6 +82,9 @@
 
 	.global paused
 
+	.global cubecolor
+	.global cursorcolor
+
 	.text
 	.global uart_init
 	.global output_character
@@ -91,6 +94,7 @@
 	.global UART0_Handler
 	.global Switch_Handler
 	.global board_handler
+	.global color_handler
 
 	.global gpio_interrupt_init
 	.global uart_interrupt_init
@@ -187,14 +191,13 @@ ptr_to_board:			.word board
 ptr_to_paused:			.word paused
 ptr_to_maxtime:			.word maxtime
 
+ptr_to_cubecolor		.word cubecolor
+ptr_to_cursorcolor		.word cursorcolor
 
 
 ;_______________________________________________________________________________________
 
-
 U0FR: 		.equ 0x18
-
-
 
 ;_______________________________________________________________________________________
 
@@ -1587,12 +1590,73 @@ end_l:
 
 	POP {r4-r12,lr}   ; Restore registers
     mov pc, lr
-    
+
 color_handler
 	PUSH {r4-r12,lr}
-	
-	
-	
+
+	LDR r0, ptr_to_sideflag
+	LDR r1, [r0]
+	CMP r1, #0
+	BEQ c_face1
+	CMP r1, #1
+	BEQ c_face2
+	CMP r1, #2
+	BEQ c_face3
+	CMP r1, #3
+	BEQ c_face4
+	CMP r1, #4
+	BEQ c_face5
+	CMP r1, #5
+	BEQ c_face6
+
+c_face1:
+	LDR r6, ptr_to_s1
+
+	b c_finder
+
+c_face2:
+	LDR r6, ptr_to_s2
+
+	b c_finder
+
+c_face3:
+	LDR r6, ptr_to_s3
+
+	b c_finder
+
+c_face4:
+	LDR r6, ptr_to_s4
+
+	b c_finder
+
+c_face5:
+	LDR r6, ptr_to_s5
+
+	b c_finder
+
+c_face6:
+	LDR r6, ptr_to_s6
+
+	b c_finder
+
+
+c_finder:
+	LDR r0, ptr_to_spos
+	LDR r1, [r0]
+c_loop
+	CMP r1, #1
+	BEQ c_end
+
+
+	ADD r6, r6, #1
+	SUB r1, r1, #1
+	B c_loop
+
+
+c_end:
+	LDRB r0, [r6]
+	LDR r1, ptr_to_cubecolor
+	STR r0, [r1]
 
 
 	POP {r4-r12,lr}   ; Restore registers
