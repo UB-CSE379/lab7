@@ -245,9 +245,9 @@ positionflag:	.word 0		; used to render the board
 startingpos:	.word 5		; used to track the cursor
 
 data:			.string "",0
-maxtime: 		.word 10
+maxtime: 		.word -1
 
-cursorcolor:	.word 3
+cursorcolor:	.word 51
 cubecolor:		.word 0
 
 
@@ -266,6 +266,7 @@ cubecolor:		.word 0
 	.global read_from_push_btns		; alice board inputs
 	.global gpio_btn_and_LED_init
 	.global color_handler
+	.global space_handler
 
 
 
@@ -387,12 +388,7 @@ ptr_to_b1sqr9_2:		.word b1sqr9_2
 ptr_to_b1sqr9_3:		.word b1sqr9_3
 
 
-
-
-
 ptr_to_scoreline:		.word scoreline
-
-
 
 ptr_to_prompt1:			.word prompt1
 ptr_to_rprompt:			.word rprompt
@@ -445,16 +441,11 @@ invalid_start:
 
 	BL color_handler
 
-	LDR r1, ptr_to_cubecolor
-	LDR r0, [r1]
-	BL output_string
-
 	LDR r0, ptr_to_f5
 	BL output_string
 
 
 lab7loop:
-
 
 	B lab7loop
 
@@ -510,7 +501,6 @@ lab7GameEnd
 	BEQ new_start
 
 
-
 	B end
 
 
@@ -552,6 +542,8 @@ Timer_Handler:
 	BEQ aletter
 	CMP r1, #'w'
 	BEQ wletter
+	CMP r1, #32
+	BEQ spaceletter
 
 	BNE mdone
 
@@ -633,7 +625,13 @@ dletter:
 
 ;_______________________________________________________________________________________
 
+spaceletter:
 
+	BL space_handler
+
+	BL color_handler
+
+	B mdone
 
 mdone:
 
