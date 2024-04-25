@@ -103,6 +103,7 @@
 	.global read_character
 	.global read_from_push_btns		; alice board inputs
 	.global gpio_btn_and_LED_init
+	.global illuminate_RGB_LED		; tiva RGB
 
 
 
@@ -114,7 +115,7 @@ ptr_position:			.word position
 ptr_to_pauseflag:		.word pauseflag
 ptr_to_sideflag:		.word sideflag
 ptr_to_positionflag:	.word positionflag
-ptr_to_spos				.word startingpos
+ptr_to_spos:			.word startingpos
 
 
 ptr_to_redtile:			.word redtile
@@ -191,8 +192,8 @@ ptr_to_board:			.word board
 ptr_to_paused:			.word paused
 ptr_to_maxtime:			.word maxtime
 
-ptr_to_cubecolor		.word cubecolor
-ptr_to_cursorcolor		.word cursorcolor
+ptr_to_cubecolor:		.word cubecolor
+ptr_to_cursorcolor:		.word cursorcolor
 
 
 ;_______________________________________________________________________________________
@@ -844,6 +845,84 @@ STOP_BTNS:
 	MOV pc, lr
 
 ;_______________________________________________________________________________________
+
+illuminate_RGB_LED:
+
+	PUSH {r4-r12,lr}	; Spill registers to stack
+
+          ; Your code is placed here
+    ;Initialize Clock Address
+    ; Color is passed in from r4 in ptr
+
+    LDR r4, ptr_to_cursorcolor
+    LDRB r5, [r4]
+
+    MOV r3, #0x5000
+    MOVT r3, #0x4002
+
+    LDRB r6, [r7, #0x3FC] ; GPIODATA
+
+	CMP r5, #1
+	BEQ RED
+
+ 	CMP r5, #3
+  	BEQ BLUE
+
+	CMP r5, #5
+	BEQ YELLOW
+
+	CMP r5, #6
+	BEQ PURPLE
+
+	CMP r5, #8
+	BEQ WHITE
+
+	CMP r5, #9
+	BEQ GREEN
+
+
+    ; RED , turn on pin 1, turn off pin 2 and 3
+RED:
+    ORR r6, r6, #0x02     ; need to turn pin 1 on that is 0000 0010
+    STRB r6, [r7, #0x3FC]		; Turn on 0000 0010
+	B COLOR_STOP
+
+    ; BLUE, turn on pin 2, turn off pin 1 and 3 so 0000 0100
+BLUE:
+	ORR r6, r6, #0x04
+	STRB r6, [r7, #0x3FC]
+	B COLOR_STOP
+
+    ; GREEN, turn on pin 3, turn off pin 1 and 2 so 0000 1000
+GREEN:
+	ORR r6, r6, #0x08
+	STRB r6, [r7, #0x3FC]
+	B COLOR_STOP
+
+    ; PURPLE = red + blue, pins 1 and 2 on, 3 off -> 0000 0110
+PURPLE:
+	ORR r6, r6, #06
+	STRB r6, [r7, #0x3FC]
+	B COLOR_STOP
+
+    ; YELLOW = red + green, pins 1 and 3, 2 off -> 0000 1010
+YELLOW:
+	ORR r6, r6, #0x0A
+	STRB r6, [r7, #0x3FC]
+	B COLOR_STOP
+
+    ; WHITE = red + blue + green, pins 1-3 on -> 0000 1110
+WHITE:
+	ORR r6, r6, #0x0E
+	STRB r6, [r7, #0x3FC]
+	B COLOR_STOP
+
+COLOR_STOP:
+
+	POP {r4-r12,lr}  	; Restore registers from stack
+	MOV pc, lr
+
+;_________________________________________________________________________________________________________________________________________________
 
 board_handler:
 	PUSH {r4-r12,lr}
