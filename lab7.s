@@ -213,6 +213,16 @@ prompt1: 			.string "******************************************", 0xA, 0xD
 					.string "******************************************", 0xA, 0xD
 					.string "",0x0
 
+alicePrompt: 		.string "******************************************", 0xA, 0xD
+					.string "Select the game mode using the Alice Board", 0xA, 0xD
+					.string "******************************************", 0xA, 0xD
+					.string " Press SW5 for a 100 second time limit    ", 0xA, 0xD
+					.string " Press SW4 for a 200 second time limit    ", 0xA, 0xD
+					.string " Press SW3 for a 300 second time limit    ", 0xA, 0xD
+					.string "    Press SW2 for unlimited time          ", 0xA, 0xD
+					.string "******************************************", 0xA, 0xD
+					.string "",0x0
+
 rprompt: 			.string "******************************************", 0xA, 0xD
 					.string "      Would You Like to Run It Back?  ", 0xA, 0xD
 					.string "******************************************", 0xA, 0xD
@@ -265,6 +275,7 @@ cubecolor:		.word 0
 	.global board_handler
 	.global read_from_push_btns		; alice board inputs
 	.global gpio_btn_and_LED_init
+	.global illuminate_RGB_LED		; tiva RGB
 	.global color_handler
 
 
@@ -395,6 +406,7 @@ ptr_to_scoreline:		.word scoreline
 
 
 ptr_to_prompt1:			.word prompt1
+ptr_to_alicePrompt:		.word alicePrompt
 ptr_to_rprompt:			.word rprompt
 ptr_to_data:			.word data
 ptr_to_maxtime:			.word maxtime
@@ -412,7 +424,7 @@ lab7:
 	BL gpio_interrupt_init
 	BL gpio_btn_and_LED_init
 
-new_start
+new_start:
 	LDR r0, ptr_to_clearscreen	; clears the uart
 	BL output_string
 
@@ -432,6 +444,10 @@ invalid_start:
 	LDR r0, ptr_to_prompt1
 	BL output_string
 
+;	LDR r0, ptr_to_alicePrompt
+;	BL output_string
+
+; might need to clear screen
 ;	BL read_from_push_btns
 	BL read_character
 
@@ -458,7 +474,7 @@ lab7loop:
 
 	B lab7loop
 
-lab7GameEnd
+lab7GameEnd:
 
 	LDR r0, ptr_to_pauseflag
 	MOV r1, #1
@@ -726,4 +742,3 @@ timerEnd:
 end:
 
 	.end
-
