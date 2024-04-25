@@ -3,6 +3,7 @@
 	.global board
 	.global current
 	.global pauseflag
+	.global maxtime
 
 	.global face1
 	.global face2
@@ -79,24 +80,228 @@
 	.global	leftside
 	.global position
 
+	.global paused
 
+
+
+
+
+
+
+
+
+cube1: .string "272771682",0
+cube2: .string "526643143",0
+cube3: .string "477135871",0
+cube4: .string "329353855",0
+cube5: .string "858599598",0
+cube6: .string "859988999",0
+
+board:	.string "+--------------------+", 0xA, 0xD
+		.string "|      |      |      |", 0xA, 0xD
+		.string "|      |      |      |", 0xA, 0xD
+		.string "|      |      |      |", 0xA, 0xD
+		.string "|--------------------|", 0xA, 0xD
+		.string "|      |      |      |", 0xA, 0xD
+		.string "|      |      |      |", 0xA, 0xD
+		.string "|      |      |      |", 0xA, 0xD
+		.string "|--------------------|", 0xA, 0xD
+		.string "|      |      |      |", 0xA, 0xD
+		.string "|      |      |      |", 0xA, 0xD
+		.string "|      |      |      |", 0xA, 0xD
+		.string "+--------------------+", 0
+
+
+scoreline:		.string 27,"[15;1H",0
+clearline:		.string 27,"[K",0
+
+
+;cursor positions
+face1:			.string 27,"[40m"
+				.string 27,"[3;4H  ",0
+
+face2:			.string 27,"[40m"
+				.string 27,"[7;4H  ",0
+
+face3:			.string 27,"[40m"
+				.string 27,"[11;4H  ",0
+
+face4:			.string 27,"[40m"
+				.string 27,"[3;11H  ",0
+
+face5:			.string 27,"[40m"
+				.string 27,"[7;11H  ",0
+
+face6:			.string 27,"[40m"
+				.string 27,"[11;11H  ",0
+
+face7:			.string 27,"[40m"
+				.string 27,"[3;18H  ",0
+
+face8:			.string 27,"[40m"
+				.string 27,"[7;18H  ",0
+
+face9:			.string 27,"[40m"
+				.string 27,"[11;18H  ",0
+
+
+;side 1
+
+b1sqr1_1:		.string 27,"[2;2H      "
+b1sqr1_2:		.string 27,"[3;2H      "
+b1sqr1_3:		.string 27,"[4;2H      "
+				.string 27,"[40m",0
+
+b1sqr2_1:		.string 27,"[6;2H      "
+b1sqr2_2:		.string 27,"[7;2H      "
+b1sqr2_3:		.string 27,"[8;2H      "
+				.string 27,"[40m",0
+
+b1sqr3_1:		.string 27,"[10;2H      "
+b1sqr3_2:		.string 27,"[11;2H      "
+b1sqr3_3:		.string 27,"[12;2H      "
+				.string 27,"[40m",0
+
+b1sqr4_1:		.string 27,"[2;9H      "
+b1sqr4_2:		.string 27,"[3;9H      "
+b1sqr4_3:		.string 27,"[4;9H      "
+				.string 27,"[40m",0
+
+b1sqr5_1:		.string 27,"[6;9H      "
+b1sqr5_2:		.string 27,"[7;9H      "
+b1sqr5_3:		.string 27,"[8;9H      "
+				.string 27,"[40m",0
+
+b1sqr6_1:		.string 27,"[10;9H      "
+b1sqr6_2:		.string 27,"[11;9H      "
+b1sqr6_3:		.string 27,"[12;9H      "
+				.string 27,"[40m",0
+
+b1sqr7_1:		.string 27,"[2;16H      "
+b1sqr7_2:		.string 27,"[3;16H      "
+b1sqr7_3:		.string 27,"[4;16H      "
+				.string 27,"[40m",0
+
+b1sqr8_1:		.string 27,"[6;16H      "
+b1sqr8_2:		.string 27,"[7;16H      "
+b1sqr8_3:		.string 27,"[8;16H      "
+				.string 27,"[40m",0
+
+b1sqr9_1:		.string 27,"[10;16H      "
+b1sqr9_2:		.string 27,"[11;16H      "
+b1sqr9_3:		.string 27,"[12;16H      "
+				.string 27,"[40m",0
+
+redtile: 	.string 27,"[41m",0
+bluetile: 	.string 27,"[44m",0
+whitetile:  .string 27,"[47m",0
+greentile:  .string 27,"[42m",0
+yellowtile: .string 27,"[43m",0
+purpletile: .string 27,"[45m",0
+resettile: 	.string 27,"[40m",0
+
+
+paused: 			.string 27,"[3;9HGame Paused""",0
+
+
+prompt1: 			.string "******************************************", 0xA, 0xD
+					.string "  Welcome to the CSE379 RUBIX CUBE game!  ", 0xA, 0xD
+					.string "******************************************", 0xA, 0xD
+					.string " Press enter to begin setting up the game ", 0xA, 0xD
+					.string "******************************************", 0xA, 0xD
+					.string "",0x0
+
+rprompt: 			.string "******************************************", 0xA, 0xD
+					.string "      Would You Like to Run It Back?  ", 0xA, 0xD
+					.string "******************************************", 0xA, 0xD
+					.string "       Press enter to start again", 0xA, 0xD
+					.string "******************************************", 0xA, 0xD
+					.string "",0x0
+
+
+clearscreen: 		.string 27,"[2J",0
+leftside: 			.string 27,"[0;0H",0
+
+
+
+newLine: 			.cstring "\r\n"
+
+timeOutput: 		.string "                                h"
+time: 				.word 0
+runningtime:	.cstring "time: "
+
+moveOutput: 		.string "                                h"
+moves: 				.word 0
+runningmoves:		.cstring "Moves: "
+
+
+current:		.string "x",0
+position: 		.word 0xFB	; center
+pauseflag:		.word 0
+sideflag:		.word 0
+positionflag:	.word 0		; used to render the board
+startingpos:	.word 5		; used to track the cursor
+
+data:			.string "",0
+maxtime: 		.word 10
+
+
+;_______________________________________________________________________________________
 	.text
-	.global uart_init
-	.global output_character
-	.global output_string
-	.global read_string
-	.global int2string
+
+	.global uart_interrupt_init
+	.global gpio_interrupt_init
+	.global timer_interrupt_init
 	.global UART0_Handler
 	.global Switch_Handler
-	.global board_handler
-
-	.global gpio_interrupt_init
-	.global uart_interrupt_init
-	.global timer_interrupt_init
+	.global Timer_Handler			; This is needed for Lab #6
 	.global simple_read_character
+	.global lab7
+	.global board_handler
+	.global read_from_push_btns		; alice board inputs
+	.global gpio_btn_and_LED_init
 
 
 
+	.global w_handler
+	.global a_handler
+	.global s_handler
+	.global d_handler
+
+
+	; from library file
+	.global output_character		; This is from your Lab #4 Library
+	.global read_string				; This is from your Lab #4 Library
+	.global output_string			; This is from your Lab #4 Library
+	.global uart_init				; This is from your Lab #4 Library
+	.global int2string				; This is from your Lab #4 Library
+	.global read_character
+
+
+;_______________________________________________________________________________________
+
+U0FR: 		.equ 0x18
+
+;_______________________________________________________________________________________
+
+
+ptr_to_board: 			.word board
+ptr_to_clearscreen:		.word clearscreen
+ptr_to_leftside			.word leftside
+
+ptr_to_paused: 			.word paused
+
+
+ptr_to_time:			.word time
+ptr_to_runningtime: 	.word runningtime
+ptr_timeOutput: 		.word timeOutput
+
+ptr_to_moves:			.word moves
+ptr_to_runningmoves: 	.word runningmoves
+ptr_moveOutput: 		.word moveOutput
+
+
+ptr_newLine: 			.word newLine
 
 ptr_to_current:			.word current
 ptr_position:			.word position
@@ -175,536 +380,74 @@ ptr_to_b1sqr9_1:		.word b1sqr9_1
 ptr_to_b1sqr9_2:		.word b1sqr9_2
 ptr_to_b1sqr9_3:		.word b1sqr9_3
 
-ptr_to_clearscreen: 	.word clearscreen
-ptr_to_leftside:		.word leftside
-ptr_to_board:			.word board
 
 
+
+
+ptr_to_scoreline:		.word scoreline
+
+
+
+ptr_to_prompt1:			.word prompt1
+ptr_to_rprompt:			.word rprompt
+ptr_to_data:			.word data
+ptr_to_maxtime:			.word maxtime
 ;_______________________________________________________________________________________
 
-
-U0FR: 		.equ 0x18
-
-
-
-;_______________________________________________________________________________________
-
-
-simple_read_character:
-
-	MOV r1, #0xC000
-    MOVT r1, #0x4000
-   	LDRB r0, [r1]
-
-	MOV pc, lr
-
-;_______________________________________________________________________________________
-
-Switch_Handler:
-; Your code for your Switch handler goes here.
-	; Remember to preserver registers r4-r11 by pushing then popping
-	; them to & from the stack at the beginning & end of the handler
-	PUSH {r4 - r11}
-
-	; Clear Interrupt
-	MOV r4, #0x5000
-	MOVT r4, #0x4002
-
-	; Get Timer 0 Base Address
-	MOV r5, #0x0000
-	MOVT r5, #0x4003 ; Timer 0 Base Address
-
-	;GPIOICR Offset
-	LDRB r6, [r4, #0x41C]
-	ORR r6, r6, #0x10 ; 0001 0000
-	STRB r6, [r4, #0x41C]
-
-	; check if game is paused
-	LDR r7, ptr_to_pauseflag
-	LDRB r8, [r7]
-	CMP r8, #1 ; if 1, need to resume game
-	BEQ RESUME
-
-	; If not paused, need to pause the game
-	; Disable the timer
-	LDR r9, [r5, #0x00C]
-	BIC r9, r9, #0x01
-	STR r9, [r5, #0x00C]
-
-	; Add 1 to pauseFlag saying game is paused now
-	ADD r8, r8, #1
-	STRB r8, [r7]
-	B SWITCH_END
-
-RESUME: ;If flag is 1, game is paused, need to resume, enable timer
-	;Enable Timer
-	LDR r9, [r5, #0x00C]
-	ORR r9, r9, #0x01 ; Write 1 to bit 0 to enable timer
-	STR r9, [r5, #0x00C]
-	; Set pauseflag to 0 saying game is not paused
-	SUB r8, r8, #1 ; r8 was 1, r8 - 1 = 0
-	STRB r8, [r7]
-
-
-
-SWITCH_END:
-
-
-	POP {r4 - r11}
-
-	BX lr       	; Return
-
-;_______________________________________________________________________________________
-
-
-UART0_Handler:
+lab7:
 	PUSH {r4-r12,lr}
 
-	MOV r4, #0xC000				;clears the interupt
-	MOVT r4, #0x4000
-	LDR r5, [ r4, #0x044]
-	ORR r5, r5, #16
-	STR r5, [ r4, #0x044]
+	;initializes the things
+ 	BL uart_init
+	BL uart_interrupt_init
+	BL gpio_interrupt_init
+	BL gpio_btn_and_LED_init
 
-	BL simple_read_character
-	MOV r5, r0
+new_start
+	LDR r0, ptr_to_clearscreen	; clears the uart
+	BL output_string
 
-	CMP r0, #'w'
-	BEQ w
-	CMP r0, #'d'
-	BEQ d
-	CMP r0, #'a'
-	BEQ a
-	CMP r0, #'s'
-	BEQ s
-	B w
+	LDR r0, ptr_to_leftside		; Goes to left side idk why but from lect
+	BL output_string
 
-w:
-	LDR r4, ptr_to_current
-	STR r0, [r4]
-	B end2
+	LDR r0, ptr_to_pauseflag
+	MOV r1, #0
+	STR r1, [r0]
 
-d:
-	LDR r4, ptr_to_current
-	STR r0, [r4]
-	B end2
+	LDR r2, ptr_to_time
+	MOV r1, #0
+	STR r1, [r2]
 
-a:
-	LDR r4, ptr_to_current
-	STR r0, [r4]
-	B end2
 
-s:
-	LDR r4, ptr_to_current
-	STR r0, [r4]
-	B end2
+invalid_start:
+	LDR r0, ptr_to_prompt1
+	BL output_string
 
-end2:
+;	BL read_from_push_btns
+	BL read_character
 
-	POP {r4-r12,lr}
-	BX lr       	; Return
-;_______________________________________________________________________________________
+	CMP r0, #13
+	BNE invalid_start
 
-uart_init:
-	PUSH {r4-r12,lr} 	; Store any registers in the range of r4 through r12
-							; Your code for your uart_init routine is placed here
-	MOV r0, #0xE618
-    MOVT r0, #0x400F
-    MOV r1, #0x1
-    STR r1, [r0]
 
+	BL timer_interrupt_init
 
+	BL board_handler
 
-    MOV r0, #0xE608
-    MOVT r0, #0x400F
-    MOV r1, #0x1
-    STR r1, [r0]
+	LDR r0, ptr_to_f5
+	BL output_string
 
 
+lab7loop:
 
-    MOV r0, #0xC030
-    MOVT r0, #0x4000
-    MOV r1, #0x0
-    STR r1, [r0]
 
+	B lab7loop
 
+lab7GameEnd
 
-     MOV r0, #0xC024
-    MOVT r0, #0x4000
-    MOV r1, #8
-    STR r1, [r0]
-
-
-
-    MOV r0, #0xC028
-    MOVT r0, #0x4000
-    MOV r1, #44
-    STR r1, [r0]
-
-
-
-    MOV r0, #0xCFC8
-    MOVT r0, #0x4000
-    MOV r1, #0x0
-    STR r1, [r0]
-
-
-
-    MOV r0, #0xC02C
-    MOVT r0, #0x4000
-    MOV r1, #0x60
-    STR r1, [r0]
-
-
-
-    MOV r0, #0xC030
-    MOVT r0, #0x4000
-    MOV r1, #0x301
-    STR r1, [r0]
-
-
-
-    MOV r0, #0x451C
-    MOVT r0, #0x4000
-    MOV r1, #0x03
-    LDR r2 ,[r0]
-    ORR r1 , r1, r2
-    STR r1, [r0]
-
-
-    MOV r0, #0x4420
-    MOVT r0, #0x4000
-    MOV r1, #0x03
-    LDR r2 ,[r0]
-    ORR r1 , r1, r2
-    STR r1, [r0]
-
-
-	MOV r0, #0x452C
-    MOVT r0, #0x4000
-    MOV r1, #0x11
-    LDR r2 ,[r0]
-    ORR r1 , r1, r2
-    STR r1, [r0]
-
-	POP {r4-r12,lr}  	; Restore registers from stack
-	MOV pc, lr
-
-;_______________________________________________________________________________________
-
-output_character:
-	PUSH {r4-r12,lr}	; Spill registers to stack
-
-          ; Your code is placed here
-	MOV r1, #0xC000			;Base address
-	MOVT r1, #0x4000
-LOOP2:
-	LDRB r2, [r1, #U0FR]
-	AND r2,r2, #0x20
-	CMP r2, #0x20
-	BEQ LOOP2
-	STRB r0,[r1]
-
-	POP {r4-r12,lr}  	; Restore registers from stack
-	MOV pc, lr
-
-
-;_______________________________________________________________________________________
-
-
-read_character:
-	PUSH {r4-r12,lr}	; Spill registers to stack
-
-          ; Your code is placed here
-  	MOV r1, #0xC000
-	MOVT r1, #0x4000
-
-LOOP1:
-
-	LDRB r2, [r1, #U0FR]
-	AND r2,r2, #0x10
-	CMP r2, #0x10
-	BEQ LOOP1
-
-	LDRB r0,[r1]
-
-	POP {r4-r12,lr}  	; Restore registers from stack
-	MOV pc, lr
-
-
-;_______________________________________________________________________________________
-
-read_string:
-	PUSH {r4-r12,lr}	; Spill registers to stack
-
-          ; Your code is placed here
-    MOV r4, r0
-
-LOOP_RS:
-    BL read_character
-    CMP r0, #0xD
-    BEQ ENTER
-    STRB r0, [r4]
-    BL output_character
-    ADD r4, r4, #1
-    B LOOP_RS
-
-ENTER:
-    MOV r0, #0x0
-    STRB r0, [r4]
-
-	POP {r4-r12,lr}  	; Restore registers from stack
-	MOV pc, lr
-
-;_______________________________________________________________________________________
-
-
-output_string:
-	PUSH {r4-r12,lr}	; Spill registers to stack
-
-          ; Your code is placed here
-    MOV r4, r0
-
-LOOP_OS:
-	LDRB r6, [r4]
-	ADD r4, r4, #1
-
-	CMP r6, #0x0
-	BEQ EXIT
-	MOV r0,r6
-	BL output_character
-	B LOOP_OS
-
-
-
-EXIT:
-
-	POP {r4-r12,lr}  	; Restore registers from stack
-	MOV pc, lr
-
-
-;_______________________________________________________________________________________
-
-int2string:
-	PUSH {r4-r12,lr} 	; Store any registers in the range of r4 through r12
-							; that are used in your routine.  Include lr if this
-							; routine calls another routine.
-
-						; Your code for your int2string routine is placed here
-						;handle negatives
-    MOV r4, r0
-    MOV r5, r1        ; Move int into r5
-    MOV r10, #0       ; Initialize accum
-
-    CMP r5, #0
-    BGE pos      ; If positive
-    MOV r8, #'-'
-    STRB r8, [r4], #1
-    RSB r5, r5, #0    ; make positive
-
-pos: ; Check if the num is zero
-    CMP r5, #0
-    BEQ zero_fin ; If zero, go to zero_finalize
-
-conversion:
-    ; Extract digits from the number
-    MOV r7, #10
-    UDIV r8, r5, r7
-    MUL r11, r8, r7
-    SUB r7, r5, r11
-    ADD r7, r7, #'0'
-    PUSH {r7}
-    ADD r10, r10, #1  ; Increment
-    MOV r5, r8
-    CMP r5, #0
-    BNE conversion ; Loop
-
-r_loop:
-    CMP r10, #0
-    BEQ f
-    POP {r7}
-    STRB r7, [r4], #1 ; Store the digit
-    SUBS r10, r10, #1 ; Decrement
-    B r_loop    ; Repeat until all digits are stored
-
-
-
-zero_fin:
-    MOV r8, #'0'
-    STRB r8, [r4], #1 ; Store and increment
-    B f       ; Go to f to null-term and end
-
-f:
-
-    MOV r8, #0
-    STRB r8, [r4]
-
-    POP {r4-r12,lr}   ; Restore registers
-    mov pc, lr
-
-
-;_______________________________________________________________________________________
-
-gpio_interrupt_init:
-
-	; Your code to initialize the SW1 interrupt goes here
-	; Don't forget to follow the procedure you followed in Lab #4
-	; to initialize SW1.
-
-	;Enable Clock Address for Port F
-    MOV r1, #0xE000
-    MOVT r1, #0x400F
-
-    ;NEED TO ENABLE CLOCK FOR ONLY PORT F
-    LDRB r4, [r1, #0x608]
-    ORR r4, r4, #0x20	; find specfic port 0010 0000
-    STRB r4, [r1, #0x608] ;enable clock for Port F
-
-
-    ;Initlize r3 with Port F address
-    ; Set Pin 4 Direction to Input
-    MOV r3, #0x5000
-    MOVT r3, #0x4002
-    LDRB r5, [r3, #0x400] ;offset 0x400 to port F
-    AND r5, r5, #0xEF ; configure pin 4 as input
-    STRB r5, [r3, #0x400] ; write 0 to configure pin 4 as input
-
-	;Enable pull-up resistor
-	LDRB r6, [r3, #0x510]
-	ORR r6, r6, #0x10 ;
-	STRB r6, [r3, #0x510] ;Write 1 to enable pull-up resistor
-
-    ;Initilize pin as digital
-    LDRB r7, [r3, #0x51C]
-    ORR r7, r7, #0x10  ; enable pin 4 , by writing 1
-	STRB r7, [r3, #0x51C] ;write 1 to make pin digital
-
-	;Enable Edge Sensitive GPIOIS
-	LDR r8, [r3, #0x404]
-	BIC r8, r8, #0x10	;Write 0 to pin 4 to enable edge sensitive
-	STR r8, [r3, #0x404]
-
-	; Allow GPIOEV to determine edge, write 0 to pin on port
-	LDR r9, [r3, #0x408]
-	BIC r9, r9, #0x10
-	STR r9, [r3, #0x408]
-
-	; Write 0 to pin when button press ; Select this
-	LDR r6, [r3, #0x40C]
-	BIC r6, r6, #0x10
-	STR r6, [r3, #0x40C]
-
-	;Enable the Interrupt, write 1 to Bit 4
-	LDR r7, [r3, #0x410]
-	ORR r7, r7, #0x10 ; 0001 0000
-	STR r7, [r3, #0x410]
-
-	;ENO, set bit 30 bit
-	MOV r8, #0xE000
-	MOVT r8, #0xE000 ;ENO Base Address
-
-	MOV r12, #1
-
-	LDR r9, [r8, #0x100] ; ENO Offset
-	LSL r12, r12, #30   ; 0100 0000 0000 0000 0000 0000 0000 0000
-	ORR r9, r9, r12
-	STR r9, [r8, #0x100]
-
-	MOV pc, lr
-
-
-;_______________________________________________________________________________________
-
-uart_interrupt_init:
-
-	PUSH {lr}
-	; Set the Receive Interrupt Mask
-
-	MOV r0, #0xC000
-	MOVT r0, #0x4000 ; UART Base Address
-
-	LDR r4, [r0, #0x038] ; UARTIM Offset
-
-	ORR r4, r4, #0x10 ; 0001 0000
-	STR r4, [r0, #0x038]
-
-	;Configure Processor to Allow Interrupts in UART
-	MOV r1, #0xE000
-	MOVT r1, #0xE000 ; ENO Base Address
-
-	LDR r5, [r1, #0x100]
-	ORR r5, r5, #0x20 ; 0010 0000
-	STR r5, [r1, #0x100]
-
-
-	POP {lr}
-	MOV pc, lr
-;_______________________________________________________________________________________
-;Initalize timer interrupt
-timer_interrupt_init:
-	PUSH {lr}
-	; Connect Clock to Timer
-	MOV r1, #0xE000
-	MOVT r1, #0x400F
-
-	;RCGCTIMER, using Timer 0
-	LDR r5, [r1, #0x604]
-	;Write a 1 to bit 0
-	ORR r5, r5, #0x01
-	STR r5, [r1, #0x604]
-
-	;Disable Timer to Configure (GPTMCTL), write 0 to TAEN
-	MOV r1, #0x0000
-	MOVT r1, #0x4003 ; Timer 0 Base Address
-
-	LDR r5, [r1, #0x00C]
-	BIC r5, r5, #0x01
-	STR r5, [r1, #0x00C]
-
-	;Put Timer in 32-bit Mode
-	LDR r5, [r1, #0x000]
-	BIC r5, r5, #0x000 	; clear bits 0 1 and 2
-	STR r5, [r1, #0x000]
-
-	;Put Timer in Periodic Mode
-	LDR r5, [r1, #0x004]
-	ORR r5, r5, #0x02 	; Write 2 to TAMR
-	STR r5, [r1, #0x004]
-
-	;Setup Interval Period
-	LDR r5, [r1, #0x028] ;16MHz per second, want to move 2 spaces per second
-							; so interval needs to be half 8 X 10^6, 1 space per half sec
-	MOV r6, #0x1200   ; 8 million into r6 to store into reg
-	MOVT r6, #0x007A
-	STR r6, [r1, #0x028]
-
-	;Enable Timer to Interrupt Processor
-	LDR r5, [r1, #0x018]
-	ORR r5, r5, #0x01 ; Write 1 to TATOIM, bit 0
-	STR r5, [r1, #0x018]
-
-	;Config Timer to Allow Timer to Interrupt /
-	; ENO Base Address
-	MOV r7, #0xE000
-	MOVT r7, #0xE000
-
-	LDR r5, [r7, #0x100]
-	; Set Bit 19 (TIMER0A) to 1
-	ORR r5, r5, #0x00080000
-	STR r5, [r7, #0x100]
-
-	;Enable Timer
-	LDR r5, [r1, #0x00C]
-	ORR r5, r5, #0x01 ; Write 1 to bit 0 to enable timer
-	STR r5, [r1, #0x00C]
-
-	POP {lr}
-	MOV pc, lr
-
-;_______________________________________________________________________________________
-
-board_handler:
-	PUSH {r4-r12,lr}
+	LDR r0, ptr_to_pauseflag
+	MOV r1, #1
+	STR r1, [r0]
 
 	LDR r0, ptr_to_clearscreen	; clears the uart
 	BL output_string
@@ -712,743 +455,252 @@ board_handler:
 	LDR r0, ptr_to_leftside		; Goes to left side idk why but from lect
 	BL output_string
 
-	LDR r0, ptr_to_sideflag
+	;outputs score during each tick
+	LDR r0, ptr_to_runningtime
+	BL output_string
+
+
+	LDR r0, ptr_timeOutput
+	LDR r2, ptr_to_time
+	LDR r1, [r2]
+	BL int2string
+
+	LDR r0, ptr_timeOutput
+	BL output_string
+
+	LDR r0, ptr_newLine
+	BL output_string
+
+
+	LDR r0, ptr_to_runningmoves
+	BL output_string
+
+
+	LDR r0, ptr_moveOutput
+	LDR r2, ptr_to_moves
+	LDR r1, [r2]
+	BL int2string
+
+	LDR r0, ptr_moveOutput
+	BL output_string
+	LDR r0, ptr_newLine
+	BL output_string
+
+	LDR r0, ptr_to_rprompt
+	BL output_string
+
+	BL read_character
+
+	CMP r0, #13
+	BEQ new_start
+
+
+
+	B end
+
+
+	POP {lr}
+	MOV pc, lr
+
+
+;_______________________________________________________________________________________
+
+
+
+
+
+Timer_Handler:
+	PUSH {r4-r12,lr}
+
+
+	MOV r0, #0x0000				; clear interrupt
+	MOVT r0, #0x4003
+	LDRB r1, [r0, #0x024]
+	ORR r1, #1
+	STRB r1, [r0, #0x024]
+
+								; check pause
+	LDR r0, ptr_to_pauseflag
 	LDR r1, [r0]
+	CMP r1, #1
+	BEQ PAUSE
 
-	CMP r1,#0
-	BEQ side1
 
-	CMP r1,#1
-	BEQ side2
+							; prev keys
+	LDR r0, ptr_to_current
+	LDR r1, [r0]
+	CMP r1, #'s'
+	BEQ sletter
+	CMP r1, #'d'
+	BEQ dletter
+	CMP r1, #'a'
+	BEQ aletter
+	CMP r1, #'w'
+	BEQ wletter
 
-	CMP r1,#2
-	BEQ side3
+	BNE mdone
 
-	CMP r1,#3
-	BEQ side4
+;_______________________________________________________________________________________
 
-	CMP r1,#4
-	BEQ side5
+wletter:
 
-	CMP r1,#5
-	BEQ side6
+	BL w_handler
 
-	BNE end_l
 
-side1:
-
-	LDR r0, ptr_to_board			;prints the initial board
-    BL output_string
-    LDR r6, ptr_to_s1
-
-    B byte_loop1
-
-side2:
-
-	LDR r0, ptr_to_board			;prints the initial board
-    BL output_string
-    LDR r6, ptr_to_s2
-
-    B byte_loop1
-
-side3:
-
-	LDR r0, ptr_to_board			;prints the initial board
-    BL output_string
-    LDR r6, ptr_to_s3
-
-    B byte_loop1
-
-side4:
-
-	LDR r0, ptr_to_board			;prints the initial board
-    BL output_string
-    LDR r6, ptr_to_s4
-
-    B byte_loop1
-
-side5:
-
-	LDR r0, ptr_to_board			;prints the initial board
-    BL output_string
-    LDR r6, ptr_to_s5
-
-    B byte_loop1
-
-side6:
-
-	LDR r0, ptr_to_board			;prints the initial board
-    BL output_string
-    LDR r6, ptr_to_s6
-
-    B byte_loop1
-
-
-byte_loop1:
-	MOV r1, r6
-	LDRB r0, [r1]
-	CMP r0, #0
-	BEQ end_l
-	B process_byte
-post_proc:
-	LDR r4, ptr_to_positionflag
-	LDR r5, [r4]
-	ADD r5, r5, #1
-	STR r5,[r4]
-	CMP r5, #9
-	BEQ end_l
-	ADD r6, r6, #1
-	B byte_loop1
-
-
-process_byte:
-	CMP r0, #'1'
-	BEQ red
-	CMP r0, #'2'
-	BEQ red
-	CMP r0, #'3'
-	BEQ blue
-	CMP r0, #'4'
-	BEQ blue
-	CMP r0, #'5'
-	BEQ yellow
-	CMP r0, #'6'
-	BEQ purple
-	CMP r0, #'7'
-	BEQ purple
-	CMP r0, #'8'
-	BEQ white
-	CMP r0, #'9'
-	BEQ green
-
-	BNE r_end
-
-red:
-	LDR r4, ptr_to_positionflag
-	LDR r0, [r4]
-	CMP r0, #0
-	BEQ rmem1
-	CMP r0, #1
-	BEQ rmem2
-	CMP r0, #2
-	BEQ rmem3
-	CMP r0, #3
-	BEQ rmem4
-	CMP r0, #4
-	BEQ rmem5
-	CMP r0, #5
-	BEQ rmem6
-	CMP r0, #6
-	BEQ rmem7
-	CMP r0, #7
-	BEQ rmem8
-	CMP r0, #8
-	BEQ rmem9
-	bne r_end
-
-rmem1:
-	LDR r0, ptr_to_redtile
-	BL output_string
-
-	LDR r0, ptr_to_b1sqr1_1
-	BL output_string
-	b r_end
-
-rmem2:
-	LDR r0, ptr_to_redtile
-	BL output_string
-
-	LDR r0, ptr_to_b1sqr2_1
-	BL output_string
-
-	b r_end
-rmem3:
-	LDR r0, ptr_to_redtile
-	BL output_string
-
-	LDR r0, ptr_to_b1sqr3_1
-	BL output_string
-
-	b r_end
-
-rmem4:
-	LDR r0, ptr_to_redtile
-	BL output_string
-
-	LDR r0, ptr_to_b1sqr4_1
-	BL output_string
-
-	b r_end
-
-rmem5:
-	LDR r0, ptr_to_redtile
-	BL output_string
-
-	LDR r0, ptr_to_b1sqr5_1
-	BL output_string
-
-	b r_end
-
-rmem6:
-	LDR r0, ptr_to_redtile
-	BL output_string
-
-	LDR r0, ptr_to_b1sqr6_1
-	BL output_string
-
-	b r_end
-
-rmem7:
-	LDR r0, ptr_to_redtile
-	BL output_string
-
-	LDR r0, ptr_to_b1sqr7_1
-	BL output_string
-
-	b r_end
-
-rmem8:
-	LDR r0, ptr_to_redtile
-	BL output_string
-
-	LDR r0, ptr_to_b1sqr8_1
-	BL output_string
-
-	b r_end
-
-rmem9:
-	LDR r0, ptr_to_redtile
-	BL output_string
-
-	LDR r0, ptr_to_b1sqr9_1
-	BL output_string
-
-	b r_end
-
-
-blue:
-	LDR r4, ptr_to_positionflag
-	LDR r0, [r4]
-	CMP r0, #0
-	BEQ bmem1
-	CMP r0, #1
-	BEQ bmem2
-	CMP r0, #2
-	BEQ bmem3
-	CMP r0, #3
-	BEQ bmem4
-	CMP r0, #4
-	BEQ bmem5
-	CMP r0, #5
-	BEQ bmem6
-	CMP r0, #6
-	BEQ bmem7
-	CMP r0, #7
-	BEQ bmem8
-	CMP r0, #8
-	BEQ bmem9
-	bne r_end
-
-bmem1:
-	LDR r0, ptr_to_bluetile
-	BL output_string
-
-	LDR r0, ptr_to_b1sqr1_1
-	BL output_string
-	b r_end
-
-bmem2:
-	LDR r0, ptr_to_bluetile
-	BL output_string
-
-	LDR r0, ptr_to_b1sqr2_1
-	BL output_string
-
-	b r_end
-bmem3:
-	LDR r0, ptr_to_bluetile
-	BL output_string
-
-	LDR r0, ptr_to_b1sqr3_1
-	BL output_string
-
-	b r_end
-
-bmem4:
-	LDR r0, ptr_to_bluetile
-	BL output_string
-
-	LDR r0, ptr_to_b1sqr4_1
-	BL output_string
-
-	b r_end
-
-bmem5:
-	LDR r0, ptr_to_bluetile
-	BL output_string
-
-	LDR r0, ptr_to_b1sqr5_1
-	BL output_string
-
-	b r_end
-
-bmem6:
-	LDR r0, ptr_to_bluetile
-	BL output_string
-
-	LDR r0, ptr_to_b1sqr6_1
-	BL output_string
-
-	b r_end
-
-bmem7:
-	LDR r0, ptr_to_bluetile
-	BL output_string
-
-	LDR r0, ptr_to_b1sqr7_1
-	BL output_string
-
-	b r_end
-
-bmem8:
-	LDR r0, ptr_to_bluetile
-	BL output_string
-
-	LDR r0, ptr_to_b1sqr8_1
-	BL output_string
-
-	b r_end
-
-bmem9:
-	LDR r0, ptr_to_bluetile
-	BL output_string
-
-	LDR r0, ptr_to_b1sqr9_1
-	BL output_string
-
-	b r_end
-
-yellow:
-	LDR r4, ptr_to_positionflag
-	LDR r0, [r4]
-	CMP r0, #0
-	BEQ ymem1
-	CMP r0, #1
-	BEQ ymem2
-	CMP r0, #2
-	BEQ ymem3
-	CMP r0, #3
-	BEQ ymem4
-	CMP r0, #4
-	BEQ ymem5
-	CMP r0, #5
-	BEQ ymem6
-	CMP r0, #6
-	BEQ ymem7
-	CMP r0, #7
-	BEQ ymem8
-	CMP r0, #8
-	BEQ ymem9
-	bne r_end
-
-ymem1:
-	LDR r0, ptr_to_yellowtile
-	BL output_string
-
-	LDR r0, ptr_to_b1sqr1_1
-	BL output_string
-	b r_end
-
-ymem2:
-	LDR r0, ptr_to_yellowtile
-	BL output_string
-
-	LDR r0, ptr_to_b1sqr2_1
-	BL output_string
-
-	b r_end
-ymem3:
-	LDR r0, ptr_to_yellowtile
-	BL output_string
-
-	LDR r0, ptr_to_b1sqr3_1
-	BL output_string
-
-	b r_end
-
-ymem4:
-	LDR r0, ptr_to_yellowtile
-	BL output_string
-
-	LDR r0, ptr_to_b1sqr4_1
-	BL output_string
-
-	b r_end
-
-ymem5:
-	LDR r0, ptr_to_yellowtile
-	BL output_string
-
-	LDR r0, ptr_to_b1sqr5_1
-	BL output_string
-
-	b r_end
-
-ymem6:
-	LDR r0, ptr_to_yellowtile
-	BL output_string
-
-	LDR r0, ptr_to_b1sqr6_1
-	BL output_string
-
-	b r_end
-
-ymem7:
-	LDR r0, ptr_to_yellowtile
-	BL output_string
-
-	LDR r0, ptr_to_b1sqr7_1
-	BL output_string
-
-	b r_end
-
-ymem8:
-	LDR r0, ptr_to_yellowtile
-	BL output_string
-
-	LDR r0, ptr_to_b1sqr8_1
-	BL output_string
-
-	b r_end
-
-ymem9:
-	LDR r0, ptr_to_yellowtile
-	BL output_string
-
-	LDR r0, ptr_to_b1sqr9_1
-	BL output_string
-
-	b r_end
-
-purple:
-	LDR r4, ptr_to_positionflag
-	LDR r0, [r4]
-	CMP r0, #0
-	BEQ pmem1
-	CMP r0, #1
-	BEQ pmem2
-	CMP r0, #2
-	BEQ pmem3
-	CMP r0, #3
-	BEQ pmem4
-	CMP r0, #4
-	BEQ pmem5
-	CMP r0, #5
-	BEQ pmem6
-	CMP r0, #6
-	BEQ pmem7
-	CMP r0, #7
-	BEQ pmem8
-	CMP r0, #8
-	BEQ pmem9
-	bne r_end
-
-pmem1:
-	LDR r0, ptr_to_purpletile
-	BL output_string
-
-	LDR r0, ptr_to_b1sqr1_1
-	BL output_string
-	b r_end
-
-pmem2:
-	LDR r0, ptr_to_purpletile
-	BL output_string
-
-	LDR r0, ptr_to_b1sqr2_1
-	BL output_string
-
-	b r_end
-pmem3:
-	LDR r0, ptr_to_purpletile
-	BL output_string
-
-	LDR r0, ptr_to_b1sqr3_1
-	BL output_string
-
-	b r_end
-
-pmem4:
-	LDR r0, ptr_to_purpletile
-	BL output_string
-
-	LDR r0, ptr_to_b1sqr4_1
-	BL output_string
-
-	b r_end
-
-pmem5:
-	LDR r0, ptr_to_purpletile
-	BL output_string
-
-	LDR r0, ptr_to_b1sqr5_1
-	BL output_string
-
-	b r_end
-
-pmem6:
-	LDR r0, ptr_to_purpletile
-	BL output_string
-
-	LDR r0, ptr_to_b1sqr6_1
-	BL output_string
-
-	b r_end
-
-pmem7:
-	LDR r0, ptr_to_purpletile
-	BL output_string
-
-	LDR r0, ptr_to_b1sqr7_1
-	BL output_string
-
-	b r_end
-
-pmem8:
-	LDR r0, ptr_to_purpletile
-	BL output_string
-
-	LDR r0, ptr_to_b1sqr8_1
-	BL output_string
-
-	b r_end
-
-pmem9:
-	LDR r0, ptr_to_purpletile
-	BL output_string
-
-	LDR r0, ptr_to_b1sqr9_1
-	BL output_string
-
-	b r_end
-
-white:
-	LDR r4, ptr_to_positionflag
-	LDR r0, [r4]
-	CMP r0, #0
-	BEQ wmem1
-	CMP r0, #1
-	BEQ wmem2
-	CMP r0, #2
-	BEQ wmem3
-	CMP r0, #3
-	BEQ wmem4
-	CMP r0, #4
-	BEQ wmem5
-	CMP r0, #5
-	BEQ wmem6
-	CMP r0, #6
-	BEQ wmem7
-	CMP r0, #7
-	BEQ wmem8
-	CMP r0, #8
-	BEQ wmem9
-	bne r_end
-
-wmem1:
-	LDR r0, ptr_to_whitetile
-	BL output_string
-
-	LDR r0, ptr_to_b1sqr1_1
-	BL output_string
-	b r_end
-
-wmem2:
-	LDR r0, ptr_to_whitetile
-	BL output_string
-
-	LDR r0, ptr_to_b1sqr2_1
-	BL output_string
-
-	b r_end
-wmem3:
-	LDR r0, ptr_to_whitetile
-	BL output_string
-
-	LDR r0, ptr_to_b1sqr3_1
-	BL output_string
-
-	b r_end
-
-wmem4:
-	LDR r0, ptr_to_whitetile
-	BL output_string
-
-	LDR r0, ptr_to_b1sqr4_1
-	BL output_string
-
-	b r_end
-
-wmem5:
-	LDR r0, ptr_to_whitetile
-	BL output_string
-
-	LDR r0, ptr_to_b1sqr5_1
-	BL output_string
-
-	b r_end
-
-wmem6:
-	LDR r0, ptr_to_whitetile
-	BL output_string
-
-	LDR r0, ptr_to_b1sqr6_1
-	BL output_string
-
-	b r_end
-
-wmem7:
-	LDR r0, ptr_to_whitetile
-	BL output_string
-
-	LDR r0, ptr_to_b1sqr7_1
-	BL output_string
-
-	b r_end
-
-wmem8:
-	LDR r0, ptr_to_whitetile
-	BL output_string
-
-	LDR r0, ptr_to_b1sqr8_1
-	BL output_string
-
-	b r_end
-
-wmem9:
-	LDR r0, ptr_to_whitetile
-	BL output_string
-
-	LDR r0, ptr_to_b1sqr9_1
-	BL output_string
-
-	b r_end
-
-green:
-	LDR r4, ptr_to_positionflag
-	LDR r0, [r4]
-	CMP r0, #0
-	BEQ gmem1
-	CMP r0, #1
-	BEQ gmem2
-	CMP r0, #2
-	BEQ gmem3
-	CMP r0, #3
-	BEQ gmem4
-	CMP r0, #4
-	BEQ gmem5
-	CMP r0, #5
-	BEQ gmem6
-	CMP r0, #6
-	BEQ gmem7
-	CMP r0, #7
-	BEQ gmem8
-	CMP r0, #8
-	BEQ gmem9
-	bne r_end
-
-gmem1:
-	LDR r0, ptr_to_greentile
-	BL output_string
-
-	LDR r0, ptr_to_b1sqr1_1
-	BL output_string
-	b r_end
-
-gmem2:
-	LDR r0, ptr_to_greentile
-	BL output_string
-
-	LDR r0, ptr_to_b1sqr2_1
-	BL output_string
-
-	b r_end
-gmem3:
-	LDR r0, ptr_to_greentile
-	BL output_string
-
-	LDR r0, ptr_to_b1sqr3_1
-	BL output_string
-
-	b r_end
-
-gmem4:
-	LDR r0, ptr_to_greentile
-	BL output_string
-
-	LDR r0, ptr_to_b1sqr4_1
-	BL output_string
-
-	b r_end
-
-gmem5:
-	LDR r0, ptr_to_greentile
-	BL output_string
-
-	LDR r0, ptr_to_b1sqr5_1
-	BL output_string
-
-	b r_end
-
-gmem6:
-	LDR r0, ptr_to_greentile
-	BL output_string
-
-	LDR r0, ptr_to_b1sqr6_1
-	BL output_string
-
-	b r_end
-
-gmem7:
-	LDR r0, ptr_to_greentile
-	BL output_string
-
-	LDR r0, ptr_to_b1sqr7_1
-	BL output_string
-
-	b r_end
-
-gmem8:
-	LDR r0, ptr_to_greentile
-	BL output_string
-
-	LDR r0, ptr_to_b1sqr8_1
-	BL output_string
-
-	b r_end
-
-gmem9:
-	LDR r0, ptr_to_greentile
-	BL output_string
-
-	LDR r0, ptr_to_b1sqr9_1
-	BL output_string
-
-	b r_end
-
-r_end:
-
-	b post_proc
-
-end_l:
-
-	LDR r0, ptr_to_positionflag
-	MOV r1, #0
+	LDR r0, ptr_to_moves	;increases the moves by 1
+	LDR r1, [r0]
+	ADD r1, r1, #1
 	STR r1, [r0]
 
-	POP {r4-r12,lr}   ; Restore registers
-    mov pc, lr
+	B mdone
+
+;_______________________________________________________________________________________
 
 
+aletter:
+
+	BL a_handler
+
+	LDR r0, ptr_position
+	LDR r1, [r0]
+
+	LDR r0, ptr_to_moves	;increases the moves by 1
+	LDR r1, [r0]
+	ADD r1, r1, #1
+	STR r1, [r0]
+
+
+	B mdone
+
+;_______________________________________________________________________________________
+
+
+
+sletter:
+
+	BL s_handler
+
+	LDR r0, ptr_position
+	LDR r1, [r0]
+
+	LDR r0, ptr_to_moves	;increases the moves by 1
+	LDR r1, [r0]
+	ADD r1, r1, #1
+	STR r1, [r0]
+
+	B mdone
+
+;_______________________________________________________________________________________
+
+
+dletter:
+
+	BL d_handler
+
+	LDR r0, ptr_position
+	LDR r1, [r0]
+
+	LDR r0, ptr_to_moves	;increases the moves by 1
+	LDR r1, [r0]
+	ADD r1, r1, #1
+	STR r1, [r0]
+
+
+	B mdone
+
+;_______________________________________________________________________________________
+
+
+
+mdone:
+
+
+	LDR r0, ptr_to_time	;increases the score by 1
+	LDR r1, [r0]
+	ADD r1, r1, #1
+	STR r1, [r0]
+	B outputFunction
+
+
+outputFunction:
+
+	LDR r0, ptr_to_scoreline
+	BL output_string
+
+	LDR r0, ptr_to_clearline
+	BL output_string
+
+	LDR r0, ptr_to_leftside		; Goes to left side idk why but from lect
+	BL output_string
+
+
+
+	LDR r0, ptr_to_scoreline
+	BL output_string
+
+	LDR r0, ptr_to_runningtime ;prints time
+	BL output_string
+
+	LDR r0, ptr_timeOutput
+	LDR r2, ptr_to_time
+	LDR r1, [r2]
+	BL int2string
+
+	LDR r0, ptr_timeOutput
+	BL output_string
+
+	LDR r2, ptr_to_time
+	LDR r1, [r2]
+	LDR r3, ptr_to_maxtime
+	LDR r4, [r3]
+	CMP r1, r4
+	BEQ lab7GameEnd
+
+
+
+    LDR r0, ptr_newLine
+	BL output_string
+
+	LDR r0, ptr_to_runningmoves ;prints score
+	BL output_string
+
+	LDR r0, ptr_moveOutput
+	LDR r2, ptr_to_moves
+	LDR r1, [r2]
+	BL int2string
+
+	LDR r0, ptr_moveOutput
+	BL output_string
+
+	LDR r0, ptr_to_current
+	LDR r1, [r0]
+	MOV r1, #'x'
+	STR r1, [r0]
+
+
+    B timerEnd
+
+lout:
+
+	LDR r0, ptr_to_clearscreen	; clears the uart
+	BL output_string
+
+	LDR r0, ptr_to_leftside		; Goes to left side idk why but from lect
+	BL output_string
+
+
+    B timerEnd
+
+PAUSE:
+
+	LDR r0, ptr_to_paused
+	BL output_string
+
+timerEnd:
+	POP {r4-r12,lr}
+	BX lr       	; Return
+
+end:
 
 	.end
+
