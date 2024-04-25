@@ -3,6 +3,7 @@
 	.global board
 	.global current
 	.global pauseflag
+	.global maxtime
 
 	.global face1
 	.global face2
@@ -79,17 +80,16 @@
 	.global	leftside
 	.global position
 
+	.global paused
+
+	.global cursorcolor
+	.global cubecolor
 
 
-
-
-
-
-
-cube1: .string "272771682",0
-cube2: .string "526643143",0
-cube3: .string "477135871",0
-cube4: .string "329353855",0
+cube1: .string "161661681",0
+cube2: .string "516633133",0
+cube3: .string "366135861",0
+cube4: .string "319353855",0
 cube5: .string "858599598",0
 cube6: .string "859988999",0
 
@@ -107,39 +107,45 @@ board:	.string "+--------------------+", 0xA, 0xD
 		.string "|      |      |      |", 0xA, 0xD
 		.string "+--------------------+", 0
 
-
 scoreline:		.string 27,"[15;1H",0
 clearline:		.string 27,"[K",0
 
-
 ;cursor positions
-face1:			.string 27,"[40m"
-				.string 27,"[3;4H  ",0
+face1:			.string 27,"[44m"
+				.string 27,"[3;4H  "
+				.string 27,"[40m",0
 
-face2:			.string 27,"[40m"
-				.string 27,"[7;4H  ",0
+face2:			.string 27,"[44m"
+				.string 27,"[7;4H  "
+				.string 27,"[40m",0
 
-face3:			.string 27,"[40m"
-				.string 27,"[11;4H  ",0
+face3:			.string 27,"[44m"
+				.string 27,"[11;4H  "
+				.string 27,"[40m",0
 
-face4:			.string 27,"[40m"
-				.string 27,"[3;11H  ",0
+face4:			.string 27,"[44m"
+				.string 27,"[3;11H  "
+				.string 27,"[40m",0
 
-face5:			.string 27,"[40m"
-				.string 27,"[7;11H  ",0
+face5:			.string 27,"[44m"
+				.string 27,"[7;11H  "
+				.string 27,"[40m",0
 
-face6:			.string 27,"[40m"
-				.string 27,"[11;11H  ",0
+face6:			.string 27,"[44m"
+				.string 27,"[11;11H  "
+				.string 27,"[40m",0
 
-face7:			.string 27,"[40m"
-				.string 27,"[3;18H  ",0
+face7:			.string 27,"[44m"
+				.string 27,"[3;18H  "
+				.string 27,"[40m",0
 
-face8:			.string 27,"[40m"
-				.string 27,"[7;18H  ",0
+face8:			.string 27,"[44m"
+				.string 27,"[7;18H  "
+				.string 27,"[40m",0
 
-face9:			.string 27,"[40m"
-				.string 27,"[11;18H  ",0
-
+face9:			.string 27,"[44m"
+				.string 27,"[11;18H  "
+				.string 27,"[40m",0
 
 ;side 1
 
@@ -197,8 +203,21 @@ purpletile: .string 27,"[45m",0
 resettile: 	.string 27,"[40m",0
 
 
-paused: 			.string "", 0xA, 0xD
-					.string "Game Paused!!!", 0xA, 0xD
+paused: 			.string 27,"[3;9HGame Paused""",0
+
+
+prompt1: 			.string "******************************************", 0xA, 0xD
+					.string "  Welcome to the CSE379 RUBIX CUBE game!  ", 0xA, 0xD
+					.string "******************************************", 0xA, 0xD
+					.string " Press enter to begin setting up the game ", 0xA, 0xD
+					.string "******************************************", 0xA, 0xD
+					.string "",0x0
+
+rprompt: 			.string "******************************************", 0xA, 0xD
+					.string "      Would You Like to Run It Back?  ", 0xA, 0xD
+					.string "******************************************", 0xA, 0xD
+					.string "       Press enter to start again", 0xA, 0xD
+					.string "******************************************", 0xA, 0xD
 					.string "",0x0
 
 
@@ -222,8 +241,14 @@ current:		.string "x",0
 position: 		.word 0xFB	; center
 pauseflag:		.word 0
 sideflag:		.word 0
-positionflag:	.word 0
-startingpos		.word 2
+positionflag:	.word 0		; used to render the board
+startingpos:	.word 5		; used to track the cursor
+
+data:			.string "",0
+maxtime: 		.word 10
+
+cursorcolor:	.word 3
+cubecolor:		.word 0
 
 
 ;_______________________________________________________________________________________
@@ -238,6 +263,16 @@ startingpos		.word 2
 	.global simple_read_character
 	.global lab7
 	.global board_handler
+	.global read_from_push_btns		; alice board inputs
+	.global gpio_btn_and_LED_init
+	.global color_handler
+
+
+
+	.global w_handler
+	.global a_handler
+	.global s_handler
+	.global d_handler
 
 
 	; from library file
@@ -246,6 +281,8 @@ startingpos		.word 2
 	.global output_string			; This is from your Lab #4 Library
 	.global uart_init				; This is from your Lab #4 Library
 	.global int2string				; This is from your Lab #4 Library
+	.global read_character
+
 
 ;_______________________________________________________________________________________
 
@@ -354,6 +391,16 @@ ptr_to_b1sqr9_3:		.word b1sqr9_3
 
 
 ptr_to_scoreline:		.word scoreline
+
+
+
+ptr_to_prompt1:			.word prompt1
+ptr_to_rprompt:			.word rprompt
+ptr_to_data:			.word data
+ptr_to_maxtime:			.word maxtime
+
+ptr_to_cubecolor		.word cubecolor
+ptr_to_cursorcolor		.word cursorcolor
 ;_______________________________________________________________________________________
 
 lab7:
@@ -363,9 +410,47 @@ lab7:
  	BL uart_init
 	BL uart_interrupt_init
 	BL gpio_interrupt_init
+	BL gpio_btn_and_LED_init
+
+new_start
+	LDR r0, ptr_to_clearscreen	; clears the uart
+	BL output_string
+
+	LDR r0, ptr_to_leftside		; Goes to left side idk why but from lect
+	BL output_string
+
+	LDR r0, ptr_to_pauseflag
+	MOV r1, #0
+	STR r1, [r0]
+
+	LDR r2, ptr_to_time
+	MOV r1, #0
+	STR r1, [r2]
+
+
+invalid_start:
+	LDR r0, ptr_to_prompt1
+	BL output_string
+
+;	BL read_from_push_btns
+	BL read_character
+
+	CMP r0, #13
+	BNE invalid_start
+
+
 	BL timer_interrupt_init
 
 	BL board_handler
+
+	BL color_handler
+
+	LDR r1, ptr_to_cubecolor
+	LDR r0, [r1]
+	BL output_string
+
+	LDR r0, ptr_to_f5
+	BL output_string
 
 
 lab7loop:
@@ -373,7 +458,11 @@ lab7loop:
 
 	B lab7loop
 
-lab6GameEnd:
+lab7GameEnd
+
+	LDR r0, ptr_to_pauseflag
+	MOV r1, #1
+	STR r1, [r0]
 
 	LDR r0, ptr_to_clearscreen	; clears the uart
 	BL output_string
@@ -393,14 +482,10 @@ lab6GameEnd:
 
 	LDR r0, ptr_timeOutput
 	BL output_string
+
 	LDR r0, ptr_newLine
 	BL output_string
 
-	LDR r0, ptr_to_board			;prints the board
-    BL output_string
-
-    LDR r0, ptr_newLine
-	BL output_string
 
 	LDR r0, ptr_to_runningmoves
 	BL output_string
@@ -416,10 +501,13 @@ lab6GameEnd:
 	LDR r0, ptr_newLine
 	BL output_string
 
-
-	LDR r0, ptr_timeOutput
+	LDR r0, ptr_to_rprompt
 	BL output_string
 
+	BL read_character
+
+	CMP r0, #13
+	BEQ new_start
 
 
 
@@ -467,110 +555,11 @@ Timer_Handler:
 
 	BNE mdone
 
+;_______________________________________________________________________________________
 
 wletter:
-	LDR r0, ptr_position
-	LDR r1, [r0]
 
-	LDR r1, ptr_to_s1
-	LDR r0, [r1]
-	CMP r0, #0
-	BEQ s1_w
-	CMP r0, #1
-	BEQ s2_w
-	CMP r0, #2
-	BEQ s3_w
-	CMP r0, #3
-	BEQ s4_w
-	CMP r0, #4
-	BEQ s5_w
-	CMP r0, #5
-	BEQ s6_w
-
-
-s1_w:
-
-	LDR r0, ptr_to_spos
-	LDR r1, [r0]
-
-	CMP r1, #1
-	BEQ w_1
-	CMP r1, #2
-	BEQ w_2
-	CMP r1, #3
-	BEQ w_3
-	CMP r1, #4
-	BEQ w_4
-	CMP r1, #5
-	BEQ w_5
-	CMP r1, #6
-	BEQ w_6
-	CMP r1, #7
-	BEQ w_7
-	CMP r1, #8
-	BEQ w_8
-
-w_1:
-	LDR r0, ptr_to_spos
-	MOV r1, #3
-	STR r1, [r0]
-
-	LDR r0, ptr_to_sideflag
-	MOV r1, #4
-	STR r1, [r0]
-
-	BL board_handler
-
-
-	LDR r0, ptr_to_f3
-	BL output_string
-
-	B mdone
-
-w_2:
-
-	LDR r0, ptr_to_spos
-	MOV r1, #1
-	STR r1, [r0]
-
-
-	BL board_handler
-
-	LDR r0, ptr_to_f1
-	BL output_string
-
-	B mdone
-
-
-w_3:
-
-w_4:
-
-w_5:
-
-w_6:
-
-w_7:
-
-w_8:
-
-
-
-
-
-
-s2_w:
-
-s3_w:
-
-s4_w:
-
-s5_w:
-
-s6_w:
-
-
-
+	BL w_handler
 
 
 	LDR r0, ptr_to_moves	;increases the moves by 1
@@ -578,13 +567,17 @@ s6_w:
 	ADD r1, r1, #1
 	STR r1, [r0]
 
+	BL color_handler
 
 	B mdone
 
+;_______________________________________________________________________________________
 
 
 aletter:
 
+	BL a_handler
+
 	LDR r0, ptr_position
 	LDR r1, [r0]
 
@@ -593,12 +586,19 @@ aletter:
 	ADD r1, r1, #1
 	STR r1, [r0]
 
+	BL color_handler
+
 
 	B mdone
+
+;_______________________________________________________________________________________
+
 
 
 sletter:
 
+	BL s_handler
+
 	LDR r0, ptr_position
 	LDR r1, [r0]
 
@@ -607,10 +607,17 @@ sletter:
 	ADD r1, r1, #1
 	STR r1, [r0]
 
+	BL color_handler
+
 	B mdone
+
+;_______________________________________________________________________________________
+
 
 dletter:
 
+	BL d_handler
+
 	LDR r0, ptr_position
 	LDR r1, [r0]
 
@@ -619,8 +626,13 @@ dletter:
 	ADD r1, r1, #1
 	STR r1, [r0]
 
+	BL color_handler
+
 
 	B mdone
+
+;_______________________________________________________________________________________
+
 
 
 mdone:
@@ -649,7 +661,7 @@ outputFunction:
 	LDR r0, ptr_to_scoreline
 	BL output_string
 
-	LDR r0, ptr_to_runningtime ;prints score
+	LDR r0, ptr_to_runningtime ;prints time
 	BL output_string
 
 	LDR r0, ptr_timeOutput
@@ -659,6 +671,13 @@ outputFunction:
 
 	LDR r0, ptr_timeOutput
 	BL output_string
+
+	LDR r2, ptr_to_time
+	LDR r1, [r2]
+	LDR r3, ptr_to_maxtime
+	LDR r4, [r3]
+	CMP r1, r4
+	BEQ lab7GameEnd
 
 
 
@@ -693,13 +712,10 @@ lout:
 	BL output_string
 
 
-
-
-
-
     B timerEnd
 
 PAUSE:
+
 	LDR r0, ptr_to_paused
 	BL output_string
 
