@@ -1,5 +1,7 @@
 	.data
 
+bs_var: 	.word 0
+
 	.global board
 	.global current
 	.global maxtime
@@ -95,6 +97,7 @@
 	.global Switch_Handler
 	.global board_handler
 	.global color_handler
+	.global space_handler
 
 	.global gpio_interrupt_init
 	.global uart_interrupt_init
@@ -194,6 +197,8 @@ ptr_to_maxtime:			.word maxtime
 ptr_to_cubecolor		.word cubecolor
 ptr_to_cursorcolor		.word cursorcolor
 
+ptr_to_bs				.word bs_var
+
 
 ;_______________________________________________________________________________________
 
@@ -292,7 +297,9 @@ UART0_Handler:
 	BEQ a
 	CMP r0, #'s'
 	BEQ s
-	B w
+	CMP r0, #' '
+	BEQ space
+	B end2
 
 w:
 	LDR r4, ptr_to_current
@@ -313,6 +320,13 @@ s:
 	LDR r4, ptr_to_current
 	STR r0, [r4]
 	B end2
+
+space:
+
+	LDR r4, ptr_to_current
+	STR r0, [r4]
+
+ 	B end2
 
 end2:
 
@@ -1656,10 +1670,90 @@ c_loop
 c_end:
 	LDRB r0, [r6]
 	LDR r1, ptr_to_cubecolor
-	STR r0, [r1]
+	STRB r0, [r1]
 
 
 	POP {r4-r12,lr}   ; Restore registers
     mov pc, lr
+
+;----------------------------------------------------------------------------------------
+
+space_handler:
+	PUSH {r4-r12,lr}
+
+	LDR r0, ptr_to_sideflag
+	LDR r1, [r0]
+	CMP r1, #0
+	BEQ s_face1
+	CMP r1, #1
+	BEQ s_face2
+	CMP r1, #2
+	BEQ s_face3
+	CMP r1, #3
+	BEQ s_face4
+	CMP r1, #4
+	BEQ s_face5
+	CMP r1, #5
+	BEQ s_face6
+
+s_face1:
+	LDR r6, ptr_to_s1
+
+	b end_s
+
+s_face2:
+	LDR r6, ptr_to_s2
+
+	b end_s
+
+s_face3:
+	LDR r6, ptr_to_s3
+
+	b end_s
+
+s_face4:
+	LDR r6, ptr_to_s4
+
+	b end_s
+
+s_face5:
+	LDR r6, ptr_to_s5
+
+	b end_s
+
+s_face6:
+	LDR r6, ptr_to_s6
+
+	b end_s
+
+end_s:
+	LDR r0, ptr_to_spos
+	LDR r1, [r0]
+s_loop
+	CMP r1, #1
+	BEQ s_end
+
+
+	ADD r6, r6, #1
+	SUB r1, r1, #1
+	B s_loop
+
+s_end:
+	LDR r1, ptr_to_cubecolor
+	LDR r0, [r1]
+	LDR r2, ptr_to_cursorcolor
+	LDR r3, [r2]
+
+
+
+	STRB r3, [r6]
+	STR r0, [r2]
+
+
+
+
+	POP {r4-r12,lr}   ; Restore registers
+    mov pc, lr
+
 
 	.end
