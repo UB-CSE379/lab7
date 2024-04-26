@@ -86,6 +86,13 @@
 	.global cubecolor
 
 
+;cube1: .string "111111111",0
+;cube2: .string "333333333",0
+;cube3: .string "555555555",0
+;cube4: .string "666666666",0
+;cube5: .string "888888888",0
+;cube6: .string "999999999",0
+
 cube1: .string "161661681",0
 cube2: .string "516633133",0
 cube3: .string "366135861",0
@@ -213,6 +220,17 @@ prompt1: 			.string "******************************************", 0xA, 0xD
 					.string "******************************************", 0xA, 0xD
 					.string "",0x0
 
+prompt2: 			.string "******************************************", 0xA, 0xD
+					.string "  		Press SW2 For Unlimited Time ", 0xA, 0xD
+					.string "******************************************", 0xA, 0xD
+					.string "  		  Press SW3 For 300 Seconds ", 0xA, 0xD
+					.string "******************************************", 0xA, 0xD
+					.string "  		  Press SW4 For 200 Seconds ", 0xA, 0xD
+					.string "******************************************", 0xA, 0xD
+					.string "  		  Press SW5 For 100 Seconds ", 0xA, 0xD
+					.string "******************************************", 0xA, 0xD
+					.string "",0x0
+
 rprompt: 			.string "******************************************", 0xA, 0xD
 					.string "      Would You Like to Run It Back?  ", 0xA, 0xD
 					.string "******************************************", 0xA, 0xD
@@ -229,7 +247,7 @@ leftside: 			.string 27,"[0;0H",0
 newLine: 			.cstring "\r\n"
 
 timeOutput: 		.string "                                h"
-time: 				.word 0
+time: 				.word 90
 runningtime:	.cstring "time: "
 
 moveOutput: 		.string "                                h"
@@ -267,6 +285,9 @@ cubecolor:		.word 0
 	.global gpio_btn_and_LED_init
 	.global color_handler
 	.global space_handler
+	.global illuminate_RGB_LED
+	.global side_checker
+	.global validate_move
 
 
 
@@ -283,6 +304,7 @@ cubecolor:		.word 0
 	.global uart_init				; This is from your Lab #4 Library
 	.global int2string				; This is from your Lab #4 Library
 	.global read_character
+	.global cursor_color
 
 
 ;_______________________________________________________________________________________
@@ -391,6 +413,8 @@ ptr_to_b1sqr9_3:		.word b1sqr9_3
 ptr_to_scoreline:		.word scoreline
 
 ptr_to_prompt1:			.word prompt1
+ptr_to_prompt2:			.word prompt2
+
 ptr_to_rprompt:			.word rprompt
 ptr_to_data:			.word data
 ptr_to_maxtime:			.word maxtime
@@ -428,22 +452,27 @@ invalid_start:
 	LDR r0, ptr_to_prompt1
 	BL output_string
 
-;	BL read_from_push_btns
 	BL read_character
 
 	CMP r0, #13
 	BNE invalid_start
 
+	LDR r0, ptr_to_clearscreen	; clears the uart
+	BL output_string
+
+	LDR r0, ptr_to_leftside		; Goes to left side idk why but from lect
+	BL output_string
+
+;	LDR r0, ptr_to_prompt2		;prompt to setup time limit
+;	BL output_string
+
+;	BL read_from_push_btns		;reads input from alice
 
 	BL timer_interrupt_init
 
 	BL board_handler
 
 	BL color_handler
-
-	LDR r0, ptr_to_f5
-	BL output_string
-
 
 lab7loop:
 
@@ -542,7 +571,7 @@ Timer_Handler:
 	BEQ aletter
 	CMP r1, #'w'
 	BEQ wletter
-	CMP r1, #32
+	CMP r1, #' '
 	BEQ spaceletter
 
 	BNE mdone
@@ -584,8 +613,6 @@ aletter:
 	B mdone
 
 ;_______________________________________________________________________________________
-
-
 
 sletter:
 
@@ -629,7 +656,13 @@ spaceletter:
 
 	BL space_handler
 
+	BL cursor_color
+
 	BL color_handler
+
+	BL board_handler
+
+
 
 	B mdone
 
