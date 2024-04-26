@@ -2,6 +2,7 @@
 	.global board
 	.global current
 	.global pauseflag
+	.global moves
 
 	.global face1
 	.global face2
@@ -78,6 +79,9 @@
 	.global	leftside
 	.global position
 
+	.global cursorcolor
+	.global cubecolor
+
 
 	.text
 	.global uart_init
@@ -97,6 +101,7 @@
 
 	.text
 	.global d_handler
+	.global color_helper
 
 
 ptr_to_current:			.word current
@@ -179,6 +184,10 @@ ptr_to_b1sqr9_3:		.word b1sqr9_3
 ptr_to_clearscreen: 	.word clearscreen
 ptr_to_leftside:		.word leftside
 ptr_to_board:			.word board
+
+ptr_to_cubecolor:		.word cubecolor
+ptr_to_cursorcolor:		.word cursorcolor
+ptr_to_moves:			.word moves
 
 d_handler:
 	PUSH {r4-r12,lr}
