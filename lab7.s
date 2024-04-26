@@ -5,6 +5,8 @@
 	.global pauseflag
 	.global maxtime
 
+	.global moves
+
 	.global face1
 	.global face2
 	.global face3
@@ -634,6 +636,7 @@ sletter:
 
 
 dletter:
+
 
 	BL d_handler
 
