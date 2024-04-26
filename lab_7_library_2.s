@@ -7,8 +7,10 @@
 	.global cube4
 	.global cube5
 	.global cube6
-	
+
 sidesdone: 	.word 0
+
+
 
 
 	.text
@@ -334,13 +336,14 @@ LED_STOP:
 
     POP {r4-r12,lr}      ; Restore registers from stack
     MOV pc, lr
-    
+
 ;____________________________________________________________________________________________________
 
 validate_move:
     PUSH {r4-r12,lr}    ; Spill registers to stack
-    
-    
+
+
+
 
 
     POP {r4-r12,lr}      ; Restore registers from stack
