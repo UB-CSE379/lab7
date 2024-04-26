@@ -232,120 +232,268 @@ s1_s:
 
 s1s_1:
 	LDR r0, ptr_to_spos
+	LDR r4, [r0]
 	MOV r1, #2
 	STR r1, [r0]
+	BL color_helper
+	LDR r1, ptr_to_cursorcolor
+	LDR r2, [r1]
 
+	CMP r0, r2
+	BNE skipper_s1s1
+
+	LDR r0, ptr_to_spos
+	STR r4, [r0]
+
+	B fix_s1s1
+skipper_s1s1:
 	BL board_handler
 
 	LDR r0, ptr_to_f2
 	BL output_string
+fix_s1s1:
 
 	B sdone
 s1s_2:
 	LDR r0, ptr_to_spos
+	LDR r4, [r0]
 	MOV r1, #3
 	STR r1, [r0]
+	BL color_helper
+	LDR r1, ptr_to_cursorcolor
+	LDR r2, [r1]
+
+	CMP r0, r2
+	BNE skipper_s1s2
+
+	LDR r0, ptr_to_spos
+	STR r4, [r0]
+
+	B fix_s1s2
+
+skipper_s1s2:
 
 	BL board_handler
 
 	LDR r0, ptr_to_f3
 	BL output_string
-
+fix_s1s2:
 	B sdone
 s1s_3:
 	LDR r0, ptr_to_spos
+	LDR r4, [r0]
 	MOV r1, #1
 	STR r1, [r0]
 
 	LDR r0, ptr_to_sideflag
+	LDR r5, [r0]
 	MOV r1, #5
 	STR r1, [r0]
+	BL color_helper
+
+	LDR r1, ptr_to_cursorcolor
+	LDR r2, [r1]
+
+	CMP r0, r2
+	BNE skipper_s1s3
+
+
+	LDR r0, ptr_to_spos
+	STR r4, [r0]
+
+	LDR r0, ptr_to_sideflag
+	STR r5, [r0]
+
+	B fix_s1s3
+
+skipper_s1s3:
 
 	BL board_handler
 
 	LDR r0, ptr_to_f1
 	BL output_string
+fix_s1s3:
 
 	B sdone
 s1s_4:
 
 	LDR r0, ptr_to_spos
+	LDR r4, [r0]
 	MOV r1, #5
 	STR r1, [r0]
+	BL color_helper
+	LDR r1, ptr_to_cursorcolor
+	LDR r2, [r1]
+
+	CMP r0, r2
+	BNE skipper_s1s4
+
+	LDR r0, ptr_to_spos
+	STR r4, [r0]
+
+	B fix_s1s4
+
+skipper_s1s4:
 
 	BL board_handler
 
 	LDR r0, ptr_to_f5
 	BL output_string
+fix_s1s4:
 
 	B sdone
 s1s_5:
 
 	LDR r0, ptr_to_spos
+	LDR r4, [r0]
 	MOV r1, #6
 	STR r1, [r0]
+	BL color_helper
+	LDR r1, ptr_to_cursorcolor
+	LDR r2, [r1]
+
+	CMP r0, r2
+	BNE skipper_s1s5
+
+	LDR r0, ptr_to_spos
+	STR r4, [r0]
+
+	B fix_s1s5
+
+skipper_s1s5:
 
 	BL board_handler
 
 	LDR r0, ptr_to_f6
 	BL output_string
+fix_s1s5:
 
 	B sdone
 s1s_6:
 	LDR r0, ptr_to_spos
+	LDR r4, [r0]
 	MOV r1, #4
 	STR r1, [r0]
 
 	LDR r0, ptr_to_sideflag
+	LDR r5, [r0]
 	MOV r1, #5
 	STR r1, [r0]
+	BL color_helper
+
+	LDR r1, ptr_to_cursorcolor
+	LDR r2, [r1]
+
+	CMP r0, r2
+	BNE skipper_s1s6
+
+
+	LDR r0, ptr_to_spos
+	STR r4, [r0]
+
+	LDR r0, ptr_to_sideflag
+	STR r5, [r0]
+
+	B fix_s1s6
+
+skipper_s1s6:
 
 	BL board_handler
 
 	LDR r0, ptr_to_f4
 	BL output_string
-
+fix_s1s6:
 	B sdone
 
 s1s_7:
 
 	LDR r0, ptr_to_spos
+	LDR r4, [r0]
 	MOV r1, #8
 	STR r1, [r0]
+	BL color_helper
+	LDR r1, ptr_to_cursorcolor
+	LDR r2, [r1]
+
+	CMP r0, r2
+	BNE skipper_s1s7
+
+	LDR r0, ptr_to_spos
+	STR r4, [r0]
+
+	B fix_s1s7
+
+skipper_s1s7:
 
 	BL board_handler
 
 	LDR r0, ptr_to_f8
 	BL output_string
-
+fix_s1s7:
 	B sdone
 
 s1s_8:
 	LDR r0, ptr_to_spos
+	LDR r4, [r0]
 	MOV r1, #9
 	STR r1, [r0]
+	BL color_helper
+	LDR r1, ptr_to_cursorcolor
+	LDR r2, [r1]
+
+	CMP r0, r2
+	BNE skipper_s1s8
+
+	LDR r0, ptr_to_spos
+	STR r4, [r0]
+
+	B fix_s1s8
+
+skipper_s1s8:
 
 	BL board_handler
 
 	LDR r0, ptr_to_f9
 	BL output_string
+fix_s1s8:
 
 	B sdone
 
 s1s_9:
 
 	LDR r0, ptr_to_spos
+	LDR r4, [r0]
 	MOV r1, #7
 	STR r1, [r0]
 
 	LDR r0, ptr_to_sideflag
+	LDR r5, [r0]
 	MOV r1, #5
 	STR r1, [r0]
+	BL color_helper
+
+	LDR r1, ptr_to_cursorcolor
+	LDR r2, [r1]
+
+	CMP r0, r2
+	BNE skipper_s1s9
+
+
+	LDR r0, ptr_to_spos
+	STR r4, [r0]
+
+	LDR r0, ptr_to_sideflag
+	STR r5, [r0]
+
+	B fix_s1s9
+
+skipper_s1s9:
 
 	BL board_handler
 
 	LDR r0, ptr_to_f7
 	BL output_string
+fix_s1s9:
 
 	B sdone
 
