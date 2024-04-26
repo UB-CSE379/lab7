@@ -5,6 +5,7 @@
 	.global positionflag
 	.global startingpos
 	.global current
+	.global sidesdone
 
 	.global cube1
 	.global cube2
@@ -137,6 +138,7 @@ side_checker:
 	MOV r3, #0			; this will be used to store the ascii value of the first character
 	MOV r4, #0			; will be a running sum to 9
 
+
 	LDR r0, ptr_to_s1
 	LDRB r1, [r0]
 	MOV r3, r1
@@ -236,7 +238,7 @@ checker_loop6:
 	BNE checker_end
 	ADD r4, r4, #1
 	CMP r4, #8
-	BEQ checker_end
+	BEQ side6_done
 	LDRB r1, [r0, #1]
 	b checker_loop6
 
