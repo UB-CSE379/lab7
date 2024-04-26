@@ -1,6 +1,11 @@
 	.data
 	.global cursorcolor
 
+	.global sideflag
+	.global positionflag
+	.global startingpos
+	.global current
+
 	.global cube1
 	.global cube2
 	.global cube3
@@ -29,6 +34,12 @@ ptr_to_s5:				.word cube5
 ptr_to_s6:				.word cube6
 
 ptr_to_sidesdone:		.word sidesdone
+
+ptr_to_sideflag:		.word sideflag
+ptr_to_positionflag:	.word positionflag
+ptr_to_spos:			.word startingpos
+ptr_to_current:			.word current
+
 
 illuminate_RGB_LED:
 
@@ -342,6 +353,78 @@ LED_STOP:
 validate_move:
     PUSH {r4-r12,lr}    ; Spill registers to stack
 
+	LDR r1, ptr_to_sideflag
+	LDR r0, [r1]
+	CMP r0, #0
+	BEQ v_s1
+	CMP r0, #1
+	BEQ v_s2
+	CMP r0, #2
+	BEQ v_s3
+	CMP r0, #3
+	BEQ v_s4
+	CMP r0, #4
+	BEQ v_s5
+	CMP r0, #5
+	BEQ v_s6
+
+
+v_s1:
+	LDR r0, ptr_to_current
+	LDR r1, [r0]
+	CMP r1, #'s'
+	BEQ val_1_s
+	CMP r1, #'d'
+	BEQ val_1_d
+	CMP r1, #'a'
+	BEQ val_1_a
+	CMP r1, #'w'
+	BEQ val_1_w
+
+val_1_s:
+	LDR r0, ptr_to_spos
+	LDR r1, [r0]
+
+
+	b v_end
+
+val_1_d:
+
+	b v_end
+
+val_1_a:
+
+	b v_end
+
+val_1_w:
+
+
+	b v_end
+
+v_s2:
+
+	b v_end
+
+v_s3:
+
+	b v_end
+
+v_s4:
+
+	b v_end
+
+v_s5:
+
+	b v_end
+
+v_s6:
+
+	b v_end
+
+
+
+
+v_end:
 
 
 
