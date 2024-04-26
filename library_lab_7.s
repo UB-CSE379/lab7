@@ -224,7 +224,7 @@ Switch_Handler:
 ; Your code for your Switch handler goes here.
 	; Remember to preserver registers r4-r11 by pushing then popping
 	; them to & from the stack at the beginning & end of the handler
-	PUSH {r4 - r11}
+	PUSH {r4 - r12,lr}
 
 	; Clear Interrupt
 	MOV r4, #0x5000
@@ -256,24 +256,29 @@ Switch_Handler:
 	ADD r8, r8, #1
 	STRB r8, [r7]
 
+	LDR r0, ptr_to_paused
+	BL output_string
+
 
 	B SWITCH_END
 
 RESUME: ;If flag is 1, game is paused, need to resume, enable timer
 	;Enable Timer
 	LDR r9, [r5, #0x00C]
-	ORR r9, r9, #0x01 ; Write 1 to bit 0 to enable timer
+	ORR r9, r9, #0x01 ;Write 1 to bit 0 to enable timer
 	STR r9, [r5, #0x00C]
 	; Set pauseflag to 0 saying game is not paused
 	SUB r8, r8, #1 ; r8 was 1, r8 - 1 = 0
 	STRB r8, [r7]
+
+	BL board_handler
 
 
 
 SWITCH_END:
 
 
-	POP {r4 - r11}
+	POP {r4 - r12,lr}
 
 	BX lr       	; Return
 
@@ -1666,7 +1671,6 @@ cur_9:
 
 final_end:
 	BL illuminate_RGB_LED
-	BL side_checker
 
 
 	POP {r4-r12,lr}   ; Restore registers
