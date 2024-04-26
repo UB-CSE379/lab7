@@ -87,6 +87,8 @@
 	.global cursorcolor
 	.global cubecolor
 
+	.global sidesdone
+
 
 ;cube1: .string "111111111",0
 ;cube2: .string "333333333",0
@@ -212,7 +214,9 @@ purpletile: .string 27,"[45m",0
 resettile: 	.string 27,"[40m",0
 
 
-paused: 			.string 27,"[3;9HGame Paused""",0
+paused: 			.string 27,"[7;6H Game Paused"
+					.string 27,"[8;6HPress q to quit"
+					.string 27,"[9;4HPress r to restart",0
 
 
 prompt1: 			.string "******************************************", 0xA, 0xD
@@ -237,6 +241,19 @@ rprompt: 			.string "******************************************", 0xA, 0xD
 					.string "      Would You Like to Run It Back?  ", 0xA, 0xD
 					.string "******************************************", 0xA, 0xD
 					.string "       Press enter to start again", 0xA, 0xD
+					.string "******************************************", 0xA, 0xD
+					.string "         Press q to end the game", 0xA, 0xD
+					.string "******************************************", 0xA, 0xD
+					.string "",0x0
+
+lastprompt: 		.string "******************************************", 0xA, 0xD
+					.string "         Thank You For Playing!!! ", 0xA, 0xD
+					.string "******************************************", 0xA, 0xD
+					.string "",0x0
+
+winnerprompt: 		.string "******************************************", 0xA, 0xD
+					.string "           You Won Gangsta!!! ", 0xA, 0xD
+					.string "         Thank You For Playing!!! ", 0xA, 0xD
 					.string "******************************************", 0xA, 0xD
 					.string "",0x0
 
@@ -416,6 +433,8 @@ ptr_to_scoreline:		.word scoreline
 
 ptr_to_prompt1:			.word prompt1
 ptr_to_prompt2:			.word prompt2
+ptr_to_lastprompt		.word lastprompt
+ptr_to_winner			.word winnerprompt
 
 ptr_to_rprompt:			.word rprompt
 ptr_to_data:			.word data
@@ -423,6 +442,7 @@ ptr_to_maxtime:			.word maxtime
 
 ptr_to_cubecolor		.word cubecolor
 ptr_to_cursorcolor		.word cursorcolor
+ptr_to_sidesdone		.word sidesdone
 ;_______________________________________________________________________________________
 
 lab7:
@@ -433,17 +453,22 @@ lab7:
 	BL uart_interrupt_init
 	BL gpio_interrupt_init
 	BL gpio_btn_and_LED_init
+	BL timer_interrupt_init
 
-new_start
+	LDR r0, ptr_to_pauseflag
+	MOV r1, #1
+	STR r1, [r0]
+
 	LDR r0, ptr_to_clearscreen	; clears the uart
 	BL output_string
 
 	LDR r0, ptr_to_leftside		; Goes to left side idk why but from lect
 	BL output_string
 
-	LDR r0, ptr_to_pauseflag
-	MOV r1, #0
+	LDR r0, ptr_to_spos
+	MOV r1, #5
 	STR r1, [r0]
+
 
 	LDR r2, ptr_to_time
 	MOV r1, #0
@@ -470,13 +495,20 @@ invalid_start:
 
 ;	BL read_from_push_btns		;reads input from alice
 
-	BL timer_interrupt_init
+	LDR r0, ptr_to_pauseflag
+	MOV r1, #0
+	STR r1, [r0]
 
 	BL board_handler
 
 	BL color_handler
 
 lab7loop:
+	LDR r0, ptr_to_pauseflag
+	LDR r1, [r0]
+	CMP r1, #1
+	BEQ Timer_Handler
+
 
 	B lab7loop
 
@@ -529,7 +561,9 @@ lab7GameEnd
 	BL read_character
 
 	CMP r0, #13
-	BEQ new_start
+	BEQ lab7
+	CMP	r0, #'q'
+	BEQ end
 
 
 	B end
@@ -560,6 +594,13 @@ Timer_Handler:
 	LDR r1, [r0]
 	CMP r1, #1
 	BEQ PAUSE
+
+	BL side_checker
+
+	LDR r0, ptr_to_sidesdone
+	LDR r1, [r0]
+	CMP r1, #6
+	BEQ winner
 
 
 							; prev keys
@@ -665,6 +706,11 @@ spaceletter:
 
 	BL board_handler
 
+	LDR r0, ptr_to_moves	;increases the moves by 1
+	LDR r1, [r0]
+	ADD r1, r1, #1
+	STR r1, [r0]
+
 
 
 	B mdone
@@ -750,14 +796,98 @@ lout:
 
 PAUSE:
 
-	LDR r0, ptr_to_paused
-	BL output_string
+	BL read_character
+	CMP r0, #'q'
+	BEQ lab7GameEnd
+	CMP r0, #'r'
+	BEQ lab7
+
+
 
 timerEnd:
 	POP {r4-r12,lr}
 	BX lr       	; Return
 
+winner:
+	LDR r0, ptr_to_clearscreen	; clears the uart
+	BL output_string
+
+	LDR r0, ptr_to_leftside		; Goes to left side idk why but from lect
+	BL output_string
+
+	LDR r0, ptr_to_winner
+	BL output_string
+
+	LDR r0, ptr_to_runningtime
+	BL output_string
+
+
+	LDR r0, ptr_timeOutput
+	LDR r2, ptr_to_time
+	LDR r1, [r2]
+	BL int2string
+
+	LDR r0, ptr_timeOutput
+	BL output_string
+
+	LDR r0, ptr_newLine
+	BL output_string
+
+
+	LDR r0, ptr_to_runningmoves
+	BL output_string
+
+
+	LDR r0, ptr_moveOutput
+	LDR r2, ptr_to_moves
+	LDR r1, [r2]
+	BL int2string
+
+	LDR r0, ptr_moveOutput
+	BL output_string
+
+	B end_2
+
 end:
+
+	LDR r0, ptr_to_clearscreen	; clears the uart
+	BL output_string
+
+	LDR r0, ptr_to_leftside		; Goes to left side idk why but from lect
+	BL output_string
+
+	LDR r0, ptr_to_lastprompt
+	BL output_string
+
+	LDR r0, ptr_to_runningtime
+	BL output_string
+
+
+	LDR r0, ptr_timeOutput
+	LDR r2, ptr_to_time
+	LDR r1, [r2]
+	BL int2string
+
+	LDR r0, ptr_timeOutput
+	BL output_string
+
+	LDR r0, ptr_newLine
+	BL output_string
+
+
+	LDR r0, ptr_to_runningmoves
+	BL output_string
+
+
+	LDR r0, ptr_moveOutput
+	LDR r2, ptr_to_moves
+	LDR r1, [r2]
+	BL int2string
+
+	LDR r0, ptr_moveOutput
+	BL output_string
+
+end_2:
 
 	.end
 
