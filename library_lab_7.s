@@ -106,6 +106,9 @@ bs_var: 	.word 0
 	.global read_character
 	.global read_from_push_btns		; alice board inputs
 	.global gpio_btn_and_LED_init
+	.global cursor_color
+	.global illuminate_RGB_LED
+	.global side_checker
 
 
 
@@ -859,6 +862,7 @@ STOP_BTNS:
 
 ;_______________________________________________________________________________________
 
+
 board_handler:
 	PUSH {r4-r12,lr}
 
@@ -1602,6 +1606,69 @@ end_l:
 	MOV r1, #0
 	STR r1, [r0]
 
+	LDR r0, ptr_to_spos
+	LDR r1, [r0]
+	CMP r1, #1
+	BEQ cur_1
+	CMP r1, #2
+	BEQ cur_2
+	CMP r1, #3
+	BEQ cur_3
+	CMP r1, #4
+	BEQ cur_4
+	CMP r1, #5
+	BEQ cur_5
+	CMP r1, #6
+	BEQ cur_6
+	CMP r1, #7
+	BEQ cur_7
+	CMP r1, #8
+	BEQ cur_8
+	CMP r1, #9
+	BEQ cur_9
+
+cur_1:
+	LDR r0, ptr_to_f1
+	BL output_string
+	B final_end
+cur_2:
+	LDR r0, ptr_to_f2
+	BL output_string
+	B final_end
+cur_3:
+	LDR r0, ptr_to_f3
+	BL output_string
+	B final_end
+cur_4:
+	LDR r0, ptr_to_f4
+	BL output_string
+	B final_end
+cur_5:
+	LDR r0, ptr_to_f5
+	BL output_string
+	B final_end
+cur_6:
+	LDR r0, ptr_to_f6
+	BL output_string
+	B final_end
+cur_7:
+	LDR r0, ptr_to_f7
+	BL output_string
+	B final_end
+cur_8:
+	LDR r0, ptr_to_f8
+	BL output_string
+	B final_end
+cur_9:
+	LDR r0, ptr_to_f9
+	BL output_string
+	B final_end
+
+final_end:
+	BL illuminate_RGB_LED
+	BL side_checker
+
+
 	POP {r4-r12,lr}   ; Restore registers
     mov pc, lr
 
@@ -1744,16 +1811,277 @@ s_end:
 	LDR r2, ptr_to_cursorcolor
 	LDR r3, [r2]
 
-
-
 	STRB r3, [r6]
 	STR r0, [r2]
-
-
-
 
 	POP {r4-r12,lr}   ; Restore registers
     mov pc, lr
 
+cursor_color:
+	PUSH {r4-r12,lr}
+	LDR r0, ptr_to_cursorcolor
+	LDR r1, [r0]
+	CMP r1, #'1'
+	BEQ r_cursor
+	CMP r1, #'3'
+	BEQ b_cursor
+	CMP r1, #'5'
+	BEQ y_cursor
+	CMP r1, #'6'
+	BEQ p_cursor
+	CMP r1, #'8'
+	BEQ w_cursor
+	CMP r1, #'9'
+	BEQ g_cursor
+
+
+r_cursor:
+	LDR r0, ptr_to_f1
+	MOV r2, #'1'
+	STRB r2, [r0, #3]
+
+	LDR r0, ptr_to_f2
+	MOV r2, #'1'
+	STRB r2, [r0, #3]
+
+	LDR r0, ptr_to_f3
+	MOV r2, #'1'
+	STRB r2, [r0, #3]
+
+	LDR r0, ptr_to_f4
+	MOV r2, #'1'
+	STRB r2, [r0, #3]
+
+	LDR r0, ptr_to_f5
+	MOV r2, #'1'
+	STRB r2, [r0, #3]
+
+	LDR r0, ptr_to_f6
+	MOV r2, #'1'
+	STRB r2, [r0, #3]
+
+	LDR r0, ptr_to_f7
+	MOV r2, #'1'
+	STRB r2, [r0, #3]
+
+	LDR r0, ptr_to_f8
+	MOV r2, #'1'
+	STRB r2, [r0, #3]
+
+	LDR r0, ptr_to_f9
+	MOV r2, #'1'
+	STRB r2, [r0, #3]
+
+	BL board_handler
+
+	b cursor_end
+b_cursor:
+
+	LDR r0, ptr_to_f1
+	MOV r2, #'4'
+	STRB r2, [r0, #3]
+
+	LDR r0, ptr_to_f2
+	MOV r2, #'4'
+	STRB r2, [r0, #3]
+
+	LDR r0, ptr_to_f3
+	MOV r2, #'4'
+	STRB r2, [r0, #3]
+
+	LDR r0, ptr_to_f4
+	MOV r2, #'4'
+	STRB r2, [r0, #3]
+
+	LDR r0, ptr_to_f5
+	MOV r2, #'4'
+	STRB r2, [r0, #3]
+
+	LDR r0, ptr_to_f6
+	MOV r2, #'4'
+	STRB r2, [r0, #3]
+
+	LDR r0, ptr_to_f7
+	MOV r2, #'4'
+	STRB r2, [r0, #3]
+
+	LDR r0, ptr_to_f8
+	MOV r2, #'4'
+	STRB r2, [r0, #3]
+
+	LDR r0, ptr_to_f9
+	MOV r2, #'4'
+	STRB r2, [r0, #3]
+
+	BL board_handler
+
+	b cursor_end
+
+y_cursor:
+
+	LDR r0, ptr_to_f1
+	MOV r2, #'3'
+	STRB r2, [r0, #3]
+
+	LDR r0, ptr_to_f2
+	MOV r2, #'3'
+	STRB r2, [r0, #3]
+
+	LDR r0, ptr_to_f3
+	MOV r2, #'3'
+	STRB r2, [r0, #3]
+
+	LDR r0, ptr_to_f4
+	MOV r2, #'3'
+	STRB r2, [r0, #3]
+
+	LDR r0, ptr_to_f5
+	MOV r2, #'3'
+	STRB r2, [r0, #3]
+
+	LDR r0, ptr_to_f6
+	MOV r2, #'3'
+	STRB r2, [r0, #3]
+
+	LDR r0, ptr_to_f7
+	MOV r2, #'3'
+	STRB r2, [r0, #3]
+
+	LDR r0, ptr_to_f8
+	MOV r2, #'3'
+	STRB r2, [r0, #3]
+
+	LDR r0, ptr_to_f9
+	MOV r2, #'3'
+	STRB r2, [r0, #3]
+
+	BL board_handler
+
+	b cursor_end
+p_cursor:
+	LDR r0, ptr_to_f1
+	MOV r2, #'5'
+	STRB r2, [r0, #3]
+
+	LDR r0, ptr_to_f2
+	MOV r2, #'5'
+	STRB r2, [r0, #3]
+
+	LDR r0, ptr_to_f3
+	MOV r2, #'5'
+	STRB r2, [r0, #3]
+
+	LDR r0, ptr_to_f4
+	MOV r2, #'5'
+	STRB r2, [r0, #3]
+
+	LDR r0, ptr_to_f5
+	MOV r2, #'5'
+	STRB r2, [r0, #3]
+
+	LDR r0, ptr_to_f6
+	MOV r2, #'5'
+	STRB r2, [r0, #3]
+
+	LDR r0, ptr_to_f7
+	MOV r2, #'5'
+	STRB r2, [r0, #3]
+
+	LDR r0, ptr_to_f8
+	MOV r2, #'5'
+	STRB r2, [r0, #3]
+
+	LDR r0, ptr_to_f9
+	MOV r2, #'5'
+	STRB r2, [r0, #3]
+
+	BL board_handler
+
+	b cursor_end
+w_cursor:
+	LDR r0, ptr_to_f1
+	MOV r2, #'7'
+	STRB r2, [r0, #3]
+
+	LDR r0, ptr_to_f2
+	MOV r2, #'7'
+	STRB r2, [r0, #3]
+
+	LDR r0, ptr_to_f3
+	MOV r2, #'7'
+	STRB r2, [r0, #3]
+
+	LDR r0, ptr_to_f4
+	MOV r2, #'7'
+	STRB r2, [r0, #3]
+
+	LDR r0, ptr_to_f5
+	MOV r2, #'7'
+	STRB r2, [r0, #3]
+
+	LDR r0, ptr_to_f6
+	MOV r2, #'7'
+	STRB r2, [r0, #3]
+
+	LDR r0, ptr_to_f7
+	MOV r2, #'7'
+	STRB r2, [r0, #3]
+
+	LDR r0, ptr_to_f8
+	MOV r2, #'7'
+	STRB r2, [r0, #3]
+
+	LDR r0, ptr_to_f9
+	MOV r2, #'7'
+	STRB r2, [r0, #3]
+
+	BL board_handler
+
+	b cursor_end
+g_cursor:
+	LDR r0, ptr_to_f1
+	MOV r2, #'2'
+	STRB r2, [r0, #3]
+
+	LDR r0, ptr_to_f2
+	MOV r2, #'2'
+	STRB r2, [r0, #3]
+
+	LDR r0, ptr_to_f3
+	MOV r2, #'2'
+	STRB r2, [r0, #3]
+
+	LDR r0, ptr_to_f4
+	MOV r2, #'2'
+	STRB r2, [r0, #3]
+
+	LDR r0, ptr_to_f5
+	MOV r2, #'2'
+	STRB r2, [r0, #3]
+
+	LDR r0, ptr_to_f6
+	MOV r2, #'2'
+	STRB r2, [r0, #3]
+
+	LDR r0, ptr_to_f7
+	MOV r2, #'2'
+	STRB r2, [r0, #3]
+
+	LDR r0, ptr_to_f8
+	MOV r2, #'2'
+	STRB r2, [r0, #3]
+
+	LDR r0, ptr_to_f9
+	MOV r2, #'2'
+	STRB r2, [r0, #3]
+
+	BL board_handler
+	b cursor_end
+
+cursor_end:
+
+
+	POP {r4-r12,lr}   ; Restore registers
+    mov pc, lr
 
 	.end
