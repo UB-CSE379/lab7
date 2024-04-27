@@ -237,6 +237,7 @@ prompt2: 			.string "******************************************", 0xA, 0xD
 					.string "******************************************", 0xA, 0xD
 					.string "",0x0
 
+
 rprompt: 			.string "******************************************", 0xA, 0xD
 					.string "      Would You Like to Run It Back?  ", 0xA, 0xD
 					.string "******************************************", 0xA, 0xD
@@ -307,6 +308,7 @@ cubecolor:		.word 0
 	.global illuminate_RGB_LED
 	.global side_checker
 	.global validate_move
+	.global illuminateLEDs
 
 
 
@@ -322,7 +324,6 @@ cubecolor:		.word 0
 	.global output_string			; This is from your Lab #4 Library
 	.global uart_init				; This is from your Lab #4 Library
 	.global int2string				; This is from your Lab #4 Library
-	.global read_character
 	.global cursor_color
 
 
@@ -445,6 +446,25 @@ ptr_to_cursorcolor		.word cursorcolor
 ptr_to_sidesdone		.word sidesdone
 ;_______________________________________________________________________________________
 
+read_character2:
+	PUSH {r4-r12,lr}	; Spill registers to stack
+
+          ; Your code is placed here
+  	MOV r1, #0xC000
+	MOVT r1, #0x4000
+
+LOOP1:
+
+	LDRB r2, [r1, #U0FR]
+	AND r2,r2, #0x10
+	CMP r2, #0x10
+	BEQ LOOP1
+
+	LDRB r0,[r1]
+
+	POP {r4-r12,lr}  	; Restore registers from stack
+	MOV pc, lr
+
 lab7:
 	PUSH {r4-r12,lr}
 
@@ -453,7 +473,7 @@ lab7:
 	BL uart_interrupt_init
 	BL gpio_interrupt_init
 	BL gpio_btn_and_LED_init
-	BL timer_interrupt_init
+
 
 	LDR r0, ptr_to_pauseflag
 	MOV r1, #1
@@ -474,26 +494,25 @@ lab7:
 	MOV r1, #0
 	STR r1, [r2]
 
-
 invalid_start:
 	LDR r0, ptr_to_prompt1
 	BL output_string
-
-	BL read_character
-
+	PUSH {LR}
+	BL read_character2
+	POP {LR}
 	CMP r0, #13
 	BNE invalid_start
 
 	LDR r0, ptr_to_clearscreen	; clears the uart
 	BL output_string
 
-	LDR r0, ptr_to_leftside		; Goes to left side idk why but from lect
+
+	LDR r0, ptr_to_prompt2		;prompt to setup time limit
 	BL output_string
 
-;	LDR r0, ptr_to_prompt2		;prompt to setup time limit
-;	BL output_string
+	BL read_from_push_btns
 
-;	BL read_from_push_btns		;reads input from alice
+	BL timer_interrupt_init
 
 	LDR r0, ptr_to_pauseflag
 	MOV r1, #0
@@ -558,7 +577,7 @@ lab7GameEnd
 	LDR r0, ptr_to_rprompt
 	BL output_string
 
-	BL read_character
+	BL read_character2
 
 	CMP r0, #13
 	BEQ lab7
@@ -796,7 +815,7 @@ lout:
 
 PAUSE:
 
-	BL read_character
+	BL read_character2
 	CMP r0, #'q'
 	BEQ lab7GameEnd
 	CMP r0, #'r'
@@ -846,7 +865,11 @@ winner:
 	LDR r0, ptr_moveOutput
 	BL output_string
 
-	B end_2
+light_loop:
+
+	BL illuminateLEDs
+
+	B light_loop
 
 end:
 
