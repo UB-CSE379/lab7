@@ -103,7 +103,6 @@ bs_var: 	.word 0
 	.global uart_interrupt_init
 	.global timer_interrupt_init
 	.global simple_read_character
-	.global read_character
 	.global read_from_push_btns		; alice board inputs
 	.global gpio_btn_and_LED_init
 	.global cursor_color
@@ -449,7 +448,7 @@ LOOP2:
 ;_______________________________________________________________________________________
 
 
-read_character:
+read_character1:
 	PUSH {r4-r12,lr}	; Spill registers to stack
 
           ; Your code is placed here
@@ -478,7 +477,7 @@ read_string:
     MOV r4, r0
 
 LOOP_RS:
-    BL read_character
+    BL read_character1
     CMP r0, #0xD
     BEQ ENTER
     STRB r0, [r4]
@@ -817,7 +816,7 @@ read_from_push_btns:
     MOV r3, #0x7000
     MOVT r3, #0x4000
 
-	LDR r4, ptr_to_maxtime
+
 
 LOOP20:
  	;GPIODATA
@@ -844,20 +843,24 @@ LOOP20:
 
 PRESS_5: ;100 seconds for sw5
 	MOV r6, #100
+	LDR r4, ptr_to_maxtime
 	STR r6, [r4]
 	B STOP_BTNS
 
 PRESS_4: 	;200 seconds limit for sw4
 	MOV r6, #200
+	LDR r4, ptr_to_maxtime
 	STR r6, [r4]
 	B STOP_BTNS
 
 PRESS_3:	;300 seconds limit for sw3
 	MOV r6, #300
+	LDR r4, ptr_to_maxtime
 	STR r6, [r4]
 	B STOP_BTNS
 PRESS_2:	; unlimited limit for sw2, FIX LATER
 	MOV r6, #-1
+	LDR r4, ptr_to_maxtime
 	STR r6, [r4]
 	B STOP_BTNS
 
