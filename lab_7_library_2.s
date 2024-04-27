@@ -16,6 +16,10 @@
 
 sidesdone: 	.word 0
 
+dancing: 	.word 0
+
+
+
 
 
 
@@ -24,6 +28,7 @@ sidesdone: 	.word 0
 	.global illuminate_RGB_LED
 	.global side_checker
 	.global validate_move
+	.global illuminateLEDs
 
 ptr_to_cursorcolor: .word cursorcolor
 
@@ -40,6 +45,7 @@ ptr_to_sideflag:		.word sideflag
 ptr_to_positionflag:	.word positionflag
 ptr_to_spos:			.word startingpos
 ptr_to_current:			.word current
+ptr_to_dancing: 		.word dancing
 
 
 illuminate_RGB_LED:
@@ -148,7 +154,8 @@ checker_loop1:
 	ADD r4, r4, #1
 	CMP r4, #8
 	BEQ side1_done
-	LDRB r1, [r0, #1]
+	ADD r0, r0, #1
+	LDRB r1, [r0]
 	b checker_loop1
 
 side1_done:
@@ -167,7 +174,8 @@ checker_loop2:
 	ADD r4, r4, #1
 	CMP r4, #8
 	BEQ side2_done
-	LDRB r1, [r0, #1]
+	ADD r0, r0, #1
+	LDRB r1, [r0]
 	b checker_loop2
 
 side2_done:
@@ -185,7 +193,8 @@ checker_loop3:
 	ADD r4, r4, #1
 	CMP r4, #8
 	BEQ side3_done
-	LDRB r1, [r0, #1]
+	ADD r0, r0, #1
+	LDRB r1, [r0]
 	b checker_loop3
 
 side3_done:
@@ -203,7 +212,8 @@ checker_loop4:
 	ADD r4, r4, #1
 	CMP r4, #8
 	BEQ side4_done
-	LDRB r1, [r0, #1]
+	ADD r0, r0, #1
+	LDRB r1, [r0]
 	b checker_loop4
 
 side4_done:
@@ -221,7 +231,8 @@ checker_loop5:
 	ADD r4, r4, #1
 	CMP r4, #8
 	BEQ side5_done
-	LDRB r1, [r0, #1]
+	ADD r0, r0, #1
+	LDRB r1, [r0]
 	b checker_loop5
 
 side5_done:
@@ -239,7 +250,8 @@ checker_loop6:
 	ADD r4, r4, #1
 	CMP r4, #8
 	BEQ side6_done
-	LDRB r1, [r0, #1]
+	ADD r0, r0, #1
+	LDRB r1, [r0]
 	b checker_loop6
 
 side6_done:
@@ -261,15 +273,24 @@ illuminateLEDs:
 
           ; Your code is placed here
 
+
     ;Check flag to see how many sides are complete
-    LDR r4, ptr_to_sidesdone
-    LDRB r5, [r4]
+
 
     ; Get Port B Base Address
     MOV r6, #0x5000
     MOVT r6, #0x4000
 
     LDRB r7, [r6, #0x3FC]
+
+    BIC r7, r7, #0x0F
+    STRB r7, [r6, #0x3FC]
+
+    LDR r4, ptr_to_sidesdone
+    LDR r5, [r4]
+
+    CMP r5,#0
+    BEQ LED_OFF
 
     ;1 side is complete
     CMP r5, #1
@@ -290,6 +311,8 @@ illuminateLEDs:
     ;All sides are complete -> dance
     CMP r5, #6
     BEQ LED_DANCE
+
+    BNE LED_OFF
 
 ONE_DONE:
     ORR r7, r7, #0x01            ; 0000 0001
@@ -312,35 +335,68 @@ FOUR_DONE:                        ; 0000 1111
     B LED_STOP
 
 LED_DANCE:                        ; flash leds 4 times
-    ; ON all
-    ORR r7, r7, #0x0F
+	MOV r0, #0xFFFF
+	MOVT r0, #0x000F
+
+	LDR r2, ptr_to_dancing
+	LDR r1, [r2]
+	CMP r1, #0
+	BEQ dance_1
+	CMP r1, #1
+	BEQ dance_2
+	CMP r1, #2
+	BEQ dance_3
+	CMP r1, #3
+	BEQ dance_4
+	BNE dance_reset
+
+dance_1:
+	ORR r7, r7, #0x01            ; 0000 0001
     STRB r7, [r6, #0x3FC]
 
-    ; OFF All
-    BIC r7, r7, #0x0F
+
+	ADD r1, r1, #1
+	STR r1, [r2]
+
+	B delay_loop
+dance_2:
+    ORR r7, r7, #0x02
     STRB r7, [r6, #0x3FC]
 
-    ; ON all
-    ORR r7, r7, #0x0F
+	ADD r1, r1, #1
+	STR r1, [r2]
+
+	B delay_loop
+dance_3:
+    ORR r7, r7, #0x04
     STRB r7, [r6, #0x3FC]
 
-    ; OFF All
-    BIC r7, r7, #0x0F
+	ADD r1, r1, #1
+	STR r1, [r2]
+
+	B delay_loop
+dance_4
+    ORR r7, r7, #0x08
     STRB r7, [r6, #0x3FC]
 
-    ; ON all
-    ORR r7, r7, #0x0F
-    STRB r7, [r6, #0x3FC]
+	ADD r1, r1, #1
+	STR r1, [r2]
 
-    ; OFF All
-    BIC r7, r7, #0x0F
-    STRB r7, [r6, #0x3FC]
+	B delay_loop
 
-    ; ON all
-    ORR r7, r7, #0x0F
-    STRB r7, [r6, #0x3FC]
+dance_reset:
+	MOV r4, #0
+	STR r4, [r2]
 
-    ; OFF All
+	B LED_STOP
+
+delay_loop:
+	SUB r0, r0, #1
+	CMP r0, #0
+	BNE delay_loop
+	BEQ LED_STOP
+
+LED_OFF:
     BIC r7, r7, #0x0F
     STRB r7, [r6, #0x3FC]
     B LED_STOP
